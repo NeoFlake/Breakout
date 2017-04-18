@@ -20,7 +20,7 @@ let mouseX;
 blc = {};
 ship = {};
 
-brickposition = [[0,0],[100,50],[200,100],[300,150],[400,200],[500,250],[600,300],[700,350],[800,400],[900,450]];
+brickposition = [[400,200],[440,200],[480,200],[520,200],[400,215],[440,215],[480,215],[520,215],[400,230],[440,230],[480,230],[520,230],[400,245],[440,245],[480,245],[520,245]];
 
 bricktable = [[background,0,0],[spaceship,300,450]];
 
@@ -93,15 +93,38 @@ function initCanvas(){
 	CANVAS.width = W;
 }
 
-// Doit gérer la fonction de collision pour lui permettre d'être plus versatile sur les objets qui collisionnent. On ne gère ici que les
-// élements que rencontrent la balle et non une rencontre entre 2 objets. Par contre; pour permettre à la balle de réagir plus fidèlement
-// à la collision; il faudra gérer indépendament la collision en X pour gérer le rebond en X et la collision en Y pour gérer le rebond
-// en Y.
-
 function collisions(A,B) {
 	if (A.y+A.h < B.y || A.y > B.y+B.h || A.x > B.x+B.w || A.x+A.w < B.x)
 		return false;
 		return true;
+}
+
+function parLeX(a,b){
+	if((!(a.x > b.x+b.w) || !(a.x+a.w < b.x)) && (a.y != b.y+b.h) && (a.y+a.h != b.y)){
+			vbX *= -1;
+			console.log(a);
+		}
+}
+
+function parLeY(a,b){
+	if((!(a.y > b.y+b.h) || !(a.y+a.h < b.y)) && (a.x != b.x+b.w) && (a.x+a.w != b.x)){
+			vbY *= -1;
+			console.log(a);
+		}
+}
+
+function collisionEffect(brick){	
+		if(collisions(brick,blc)){	
+		parLeX(brick,blc);
+		parLeY(brick,blc);
+	}
+}
+
+function packOfCollisionEffect(tab){
+	for(let i = 0; i < tab.length - 2; i++){
+		let fnName = "collisionEffect(brk" + i + ");";
+		eval(fnName);
+	}
 }
 
 function bouncingBall(){
@@ -123,8 +146,6 @@ function ballrender(){
 	CONTEXT.drawImage(ball,blc.x,blc.y);
 }
 
-
-
 function brickrender(tab){
 	for(let i = 0; i < tab.length; i++){
 		CONTEXT.drawImage(tab[i][0],tab[i][1],tab[i][2]);
@@ -139,13 +160,13 @@ function fullrender(){
 function embryonMain(){
 	ballTravel();
 	bouncingBall();
+	packOfCollisionEffect(bricktable);
 	fullrender();
 }
 
 window.onload = function() {
 
 init();
-
-setInterval(embryonMain, 33);
+setInterval(embryonMain, 10);
 
 }
