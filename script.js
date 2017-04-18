@@ -20,7 +20,10 @@ let mouseX;
 blc = {};
 ship = {};
 
-brickposition = [[400,200],[440,200],[480,200],[520,200],[400,215],[440,215],[480,215],[520,215],[400,230],[440,230],[480,230],[520,230],[400,245],[440,245],[480,245],[520,245]];
+brickposition = [[400,200],[440,200],[480,200],[520,200],
+				 [400,215],[440,215],[480,215],[520,215],
+				 [400,230],[440,230],[480,230],[520,230],
+				 [400,245],[440,245],[480,245],[520,245]];
 
 bricktable = [[background,0,0],[spaceship,300,450]];
 
@@ -99,24 +102,34 @@ function collisions(A,B) {
 		return true;
 }
 
-function parLeX(a,b){
-	if((!(a.x > b.x+b.w) || !(a.x+a.w < b.x)) && (a.y != b.y+b.h) && (a.y+a.h != b.y)){
-			vbX *= -1;
-			console.log(a);
-		}
-}
-
-function parLeY(a,b){
-	if((!(a.y > b.y+b.h) || !(a.y+a.h < b.y)) && (a.x != b.x+b.w) && (a.x+a.w != b.x)){
-			vbY *= -1;
-			console.log(a);
-		}
-}
-
 function collisionEffect(brick){	
-		if(collisions(brick,blc)){	
-		parLeX(brick,blc);
-		parLeY(brick,blc);
+	if(collisions(brick,blc)){	
+		if(blc.y <= brick.y - (brick.h/2)){
+			console.log("j'ai touché le bas de la brique");
+			blc.y = brick.y - (brick.h/2);
+			return vbY *= -1;
+		}
+		else {
+			if(blc.y >= brick.y + (brick.h/2)){
+				console.log("j'ai touché le haut de la brique");
+				blc.y = brick.y + (brick.h/2) + blc.h;
+				return vbY *= -1;
+			}
+			else {
+				if(blc.x < brick.x){
+				  console.log("j'ai touché la gauche de la brique");
+				  blc.x = brick.x - blc.w - (brick.w/2);
+				  return vbX *= -1;
+				}
+				else{
+					if(blc.x > brick.x){
+					  console.log("j'ai touché la droite de la brique");
+					  blc.x = brick.x + (brick.w/2);
+					  return vbX *= -1;
+					}
+				}
+			}		
+		}
 	}
 }
 
@@ -167,6 +180,6 @@ function embryonMain(){
 window.onload = function() {
 
 init();
-setInterval(embryonMain, 10);
+setInterval(embryonMain, 33);
 
 }
