@@ -102,10 +102,25 @@ function collisions(A,B) {
 		return true;
 }
 
+function brickDeath(brick,tab){
+	if(brick.pv <= 0) {
+		brick.h = 0;
+		brick.w = 0;
+		for(let i = 0; i < tab.length; i++){
+			if(brick.x === tab[i][1] && brick.y === tab[i][2]){
+				tab[i][1] = 100000;
+				tab[i][2] = 100000;
+				brick.x = 100000;
+				brick.y = 100000;
+			}
+		}
+	}
+}
+
 function collisionEffect(brick){	
 	if(collisions(brick,blc)){
 		brick.pv -= 1;
-		console.log(brick.pv);
+		brickDeath(brick,bricktable);
 		if(blc.y <= brick.y - (brick.h/2)){
 			blc.y = blc.y - 20;
 			vbY *= -1;
