@@ -4,8 +4,8 @@ CONTEXT = CANVAS.getContext("2d");
 H = 500;
 W = 1000;
 
-vbX = Math.random() * 16;
-vbY = Math.random() * 16;
+vbX = Math.random() * 4;
+vbY = Math.random() * 4;
 
 background = new Image();
 spaceship = new Image();
@@ -38,7 +38,7 @@ brickImage(brickposition);
 
 function createBrick(tab){
 	for(let i = 0; i < tab.length; i++){
-		let fnName = "brk" + i + " = {};"
+		let fnName = "brk" + i + " = {}; brk" + i + ".pv = 2;";
 		eval(fnName);
 	}
 }
@@ -80,8 +80,8 @@ function createBrickTable(tab){
 }
 
 function ballInit(){
-	blc.x = (Math.random() * 10) * (Math.random() * 10) * (Math.random() * 10);
-	blc.y = 150;
+	blc.x = 500;
+	blc.y = 300;
 	blc.h = ball.height;
 	blc.w = ball.width;
 }
@@ -103,29 +103,27 @@ function collisions(A,B) {
 }
 
 function collisionEffect(brick){	
-	if(collisions(brick,blc)){	
+	if(collisions(brick,blc)){
+		brick.pv -= 1;
+		console.log(brick.pv);
 		if(blc.y <= brick.y - (brick.h/2)){
-			console.log("j'ai touché le bas de la brique");
-			blc.y = brick.y - (brick.h/2);
-			return vbY *= -1;
+			blc.y = blc.y - 20;
+			vbY *= -1;
 		}
 		else {
 			if(blc.y >= brick.y + (brick.h/2)){
-				console.log("j'ai touché le haut de la brique");
-				blc.y = brick.y + (brick.h/2) + blc.h;
-				return vbY *= -1;
+				blc.y = blc.y + 20;
+				vbY *= -1;
 			}
 			else {
 				if(blc.x < brick.x){
-				  console.log("j'ai touché la gauche de la brique");
-				  blc.x = brick.x - blc.w - (brick.w/2);
-				  return vbX *= -1;
+				  blc.x = blc.x - blc.w - 20;
+				  vbX *= -1;
 				}
 				else{
 					if(blc.x > brick.x){
-					  console.log("j'ai touché la droite de la brique");
-					  blc.x = brick.x + (brick.w/2);
-					  return vbX *= -1;
+					  blc.x = blc.x + 20;
+					  vbX *= -1;
 					}
 				}
 			}		
@@ -180,6 +178,6 @@ function embryonMain(){
 window.onload = function() {
 
 init();
-setInterval(embryonMain, 33);
+setInterval(embryonMain, 15);
 
 }
