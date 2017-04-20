@@ -16,6 +16,7 @@ spaceship.src = "img/spaceship.png";
 ball.src = "img/ball.png";
 
 let mouseX;
+let mouseY;
 
 blc = {};
 ship = {};
@@ -25,7 +26,7 @@ brickposition = [[400,200],[440,200],[480,200],[520,200],
 				 [400,230],[440,230],[480,230],[520,230],
 				 [400,245],[440,245],[480,245],[520,245]];
 
-bricktable = [[background,0,0],[spaceship,300,450]];
+bricktable = [[background,0,0]];
 
 function brickImage(tab){
 	for(let i = 0; i < tab.length; i++){
@@ -57,6 +58,13 @@ function packOfSpriteDimension(tab){
 	}
 }
 
+function initShip(){
+	ship.h = spaceship.height;
+	ship.w = spaceship.width;
+	ship.x = (W - ship.w) / 2;
+	ship.y = 450;
+}
+
 function initBrick(tab){
 	for(let i = 0; i < tab.length; i++){
 		let fnName = "brk" + i + ".x = " + tab[i][0] + "; brk" + i + ".y = " + tab[i][1] + ";";
@@ -68,6 +76,25 @@ function sauvageInit(){
 	packOfSpriteDimension(brickposition);
 	initBrick(brickposition);
 	createBrickTable(brickposition);
+}
+
+function souris(e){
+	if (e.x != undefined && e.y != undefined){
+		mouseX = e.x - 500;
+		mouseY = e.y;
+	}
+	else {
+	// Firefox patch
+	mouseX = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+	mouseY = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+	}
+}
+
+function initVariousParameters(){
+	CANVAS.addEventListener("mousemove", souris, false);
+	let canevas = document.getElementById("canvas");
+	canevas.style.cursor = 'none';
+	// document.body.style.cursor = 'none';
 }
 
 function createBrickTable(tab){
@@ -99,7 +126,7 @@ function initCanvas(){
 function collisions(A,B) {
 	if (A.y+A.h < B.y || A.y > B.y+B.h || A.x > B.x+B.w || A.x+A.w < B.x)
 		return false;
-		return true;
+	return true;
 }
 
 function brickDeath(brick,tab){
@@ -146,6 +173,13 @@ function collisionEffect(brick){
 	}
 }
 
+function shipCollision(){
+	if(collisions(blc,ship)){
+		
+		vbY *= -1;
+	}
+}
+
 function packOfCollisionEffect(tab){
 	for(let i = 0; i < tab.length - 2; i++){
 		let fnName = "collisionEffect(brk" + i + ");";
@@ -165,11 +199,21 @@ function bouncingBall(){
 function init(){
 	initCanvas();
 	ballInit();
+	initShip();
 	sauvageInit();
+	initVariousParameters();
+}
+
+function shipTravel(){
+	ship.x = mouseX;
 }
 
 function ballrender(){
 	CONTEXT.drawImage(ball,blc.x,blc.y);
+}
+
+function shiprender(){
+	CONTEXT.drawImage(spaceship,ship.x,ship.y);
 }
 
 function brickrender(tab){
@@ -180,13 +224,16 @@ function brickrender(tab){
 
 function fullrender(){
 	brickrender(bricktable);
+	shiprender();
 	ballrender();
 }
 
 function embryonMain(){
+	shipTravel();
 	ballTravel();
 	bouncingBall();
 	packOfCollisionEffect(bricktable);
+	shipCollision();
 	fullrender();
 }
 
