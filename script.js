@@ -80,7 +80,7 @@ function sauvageInit(){
 
 function souris(e){
 	if (e.x != undefined && e.y != undefined){
-		mouseX = e.x - 500;
+		mouseX = e.x - 215;
 		mouseY = e.y;
 	}
 	else {
@@ -88,13 +88,13 @@ function souris(e){
 	mouseX = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
 	mouseY = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
 	}
+	ship.x = mouseX;
 }
 
 function initVariousParameters(){
 	CANVAS.addEventListener("mousemove", souris, false);
 	let canevas = document.getElementById("canvas");
 	canevas.style.cursor = 'none';
-	// document.body.style.cursor = 'none';
 }
 
 function createBrickTable(tab){
@@ -175,8 +175,26 @@ function collisionEffect(brick){
 
 function shipCollision(){
 	if(collisions(blc,ship)){
-		
-		vbY *= -1;
+		if(((blc.x + (blc.w / 2) -1) >= ship.x) && ((blc.x + (blc.w / 2) -1) <= ship.x + (ship.w / 5) -1)){
+			vbX *= -2;
+			vbY *= -1;
+		}
+		if(((blc.x + (blc.w / 2) -1) > ship.x + (ship.w / 5) -1) && ((blc.x + (blc.w / 2) -1) <= ship.x + ((ship.w * 2) / 5 -1))){
+			vbX *= -1
+			vbY *= -1;
+		}
+		if(((blc.x + (blc.w / 2) -1) > ship.x + (((ship.w * 2) / 5) -1)) && ((blc.x + (blc.w / 2) -1) <= ship.x + (((ship.w * 3) / 5) -1))){
+			vbX *= .5;
+			vbY *= -.5;
+		}
+		if(((blc.x + (blc.w / 2) -1) > ship.x + (((ship.w * 3) / 5) -1)) && ((blc.x + (blc.w / 2) -1) <= ship.x + (((ship.w * 4) / 5) -1))){
+			vbX *= 1.5;
+			vbY *= -1;
+		}
+		if(((blc.x + (blc.w / 2) -1) > ship.x + (((ship.w * 4) / 5) -1)) && ((blc.x + (blc.w / 2) -1) <= ship.x + ship.w - 1)){
+			vbX *= 2;
+			vbY *= -1;
+		}
 	}
 }
 
@@ -205,7 +223,6 @@ function init(){
 }
 
 function shipTravel(){
-	ship.x = mouseX;
 }
 
 function ballrender(){
