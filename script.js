@@ -3,6 +3,8 @@ CONTEXT = CANVAS.getContext("2d");
 
 H = 500;
 W = 1000;
+score = 0;
+timePoint = 0;
 
 vbX = Math.random() * 4;
 vbY = Math.random() * 4;
@@ -27,6 +29,8 @@ brickposition = [[400,200],[440,200],[480,200],[520,200],
 				 [400,245],[440,245],[480,245],[520,245]];
 
 bricktable = [[background,0,0]];
+
+life = 3;
 
 function brickImage(tab){
 	for(let i = 0; i < tab.length; i++){
@@ -131,6 +135,7 @@ function collisions(A,B) {
 
 function brickDeath(brick,tab){
 	if(brick.pv <= 0) {
+		score += 1000;
 		brick.h = 0;
 		brick.w = 0;
 		for(let i = 0; i < tab.length; i++){
@@ -147,6 +152,7 @@ function brickDeath(brick,tab){
 function collisionEffect(brick){	
 	if(collisions(brick,blc)){
 		brick.pv -= 1;
+		score += 100;
 		brickDeath(brick,bricktable);
 		if(blc.y <= brick.y - (brick.h/2)){
 			blc.y = blc.y - 20;
@@ -176,7 +182,7 @@ function collisionEffect(brick){
 function shipCollision(){
 	if(collisions(blc,ship)){
 		if(((blc.x + (blc.w / 2) -1) >= ship.x) && ((blc.x + (blc.w / 2) -1) <= ship.x + (ship.w / 5) -1)){
-			vbX *= -2;
+			vbX *= -1.2;
 			vbY *= -1;
 		}
 		if(((blc.x + (blc.w / 2) -1) > ship.x + (ship.w / 5) -1) && ((blc.x + (blc.w / 2) -1) <= ship.x + ((ship.w * 2) / 5 -1))){
@@ -188,13 +194,21 @@ function shipCollision(){
 			vbY *= -.5;
 		}
 		if(((blc.x + (blc.w / 2) -1) > ship.x + (((ship.w * 3) / 5) -1)) && ((blc.x + (blc.w / 2) -1) <= ship.x + (((ship.w * 4) / 5) -1))){
-			vbX *= 1.5;
+			vbX *= 1.15;
 			vbY *= -1;
 		}
 		if(((blc.x + (blc.w / 2) -1) > ship.x + (((ship.w * 4) / 5) -1)) && ((blc.x + (blc.w / 2) -1) <= ship.x + ship.w - 1)){
-			vbX *= 2;
+			vbX *= 1.2;
 			vbY *= -1;
 		}
+	}
+}
+
+function gainPoint(){
+	timePoint++;
+	if(timePoint === 50){
+		score += 1;
+		timePoint = 0;
 	}
 }
 
@@ -214,15 +228,34 @@ function bouncingBall(){
 	}
 }
 
+function lifeGestion(){
+	for(let i = 0; i <= life; i++){
+		if(life > 0 && i > 0){
+			let x = 50 * i;
+			let fnName = "vie" + i + " = new Image(); vie" + i + ".src = 'img/life.png'; CONTEXT.drawImage(vie" + i + "," + x + ",50);";
+			eval(fnName);
+		}
+		if(blc.y > 490){
+			life -= 1;
+			blc.y = 480;
+			vbY *= -1;
+		}
+	}
+}
+
+function drawScore(){
+	CONTEXT.fillStyle = "lightblue";
+	CONTEXT.font = "24px Sans-Serif";
+	CONTEXT.textAlign = "right";
+	CONTEXT.fillText(score + " ", 980, 40);
+}
+
 function init(){
 	initCanvas();
 	ballInit();
 	initShip();
 	sauvageInit();
 	initVariousParameters();
-}
-
-function shipTravel(){
 }
 
 function ballrender(){
@@ -243,20 +276,22 @@ function fullrender(){
 	brickrender(bricktable);
 	shiprender();
 	ballrender();
+	drawScore();
 }
 
 function embryonMain(){
-	shipTravel();
 	ballTravel();
 	bouncingBall();
 	packOfCollisionEffect(bricktable);
 	shipCollision();
+	gainPoint();
+	lifeGestion();
 	fullrender();
 }
 
 window.onload = function() {
 
 init();
-setInterval(embryonMain, 15);
+setInterval(embryonMain, 20);
 
 }
