@@ -5,9 +5,11 @@ H = 500;
 W = 1000;
 score = 0;
 timePoint = 0;
+life = 3;
+launcher = 0;
 
 vbX = Math.random() * 4;
-vbY = Math.random() * 4;
+vbY = Math.random() * -4;
 
 background = new Image();
 spaceship = new Image();
@@ -29,8 +31,6 @@ brickposition = [[400,200],[440,200],[480,200],[520,200],
 				 [400,245],[440,245],[480,245],[520,245]];
 
 bricktable = [[background,0,0]];
-
-life = 3;
 
 function brickImage(tab){
 	for(let i = 0; i < tab.length; i++){
@@ -84,7 +84,7 @@ function sauvageInit(){
 
 function souris(e){
 	if (e.x != undefined && e.y != undefined){
-		mouseX = e.x - 215;
+		mouseX = e.x - 460 - (ship.w/2);
 		mouseY = e.y;
 	}
 	else {
@@ -213,7 +213,7 @@ function gainPoint(){
 }
 
 function packOfCollisionEffect(tab){
-	for(let i = 0; i < tab.length - 2; i++){
+	for(let i = 0; i < tab.length - 1; i++){
 		let fnName = "collisionEffect(brk" + i + ");";
 		eval(fnName);
 	}
@@ -228,18 +228,40 @@ function bouncingBall(){
 	}
 }
 
-function lifeGestion(){
-	for(let i = 0; i <= life; i++){
-		if(life > 0 && i > 0){
-			let x = 50 * i;
-			let fnName = "vie" + i + " = new Image(); vie" + i + ".src = 'img/life.png'; CONTEXT.drawImage(vie" + i + "," + x + ",50);";
-			eval(fnName);
-		}
-		if(blc.y > 490){
-			life -= 1;
-			blc.y = 480;
-			vbY *= -1;
-		}
+function initLife(){
+	for(let i = 1; i <= life; i++){
+		let fnName = "vie" + i + " = new Image(); vie" + i + ".src = 'img/life.png';";
+		eval(fnName);
+	}
+}
+
+function lifeRender(){
+	for(let i = 1; i <= life; i++){
+		let fnName = "CONTEXT.drawImage(vie" + i +", " + i * 25 + ", 25);";
+		eval(fnName);
+	}		
+}
+
+function looseLife(){
+	if(blc.y > 490){
+		life -= 1;
+		blc.y = ship.y - blc.h;
+		blc.x = ship.x + (ship.w/2);
+		vbX = 0;
+		vbY = 0;
+		launcher = 1;
+	}
+	if(launcher === 2 && vbY === 0){
+		vbX = Math.random() * 4;
+		vbY = Math.random() * -4;
+		launcher = 0;
+	}
+	if(launcher === 1){
+		blc.y = ship.y - blc.h;
+		blc.x = ship.x + (ship.w/2);
+		vbX = 0;
+		vbY = 0;
+		setTimeout(function(){launcher = 2;}, 1000);
 	}
 }
 
@@ -252,6 +274,7 @@ function drawScore(){
 
 function init(){
 	initCanvas();
+	initLife();
 	ballInit();
 	initShip();
 	sauvageInit();
@@ -277,6 +300,7 @@ function fullrender(){
 	shiprender();
 	ballrender();
 	drawScore();
+	lifeRender();
 }
 
 function embryonMain(){
@@ -285,7 +309,7 @@ function embryonMain(){
 	packOfCollisionEffect(bricktable);
 	shipCollision();
 	gainPoint();
-	lifeGestion();
+	looseLife();
 	fullrender();
 }
 
