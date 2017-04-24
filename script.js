@@ -322,7 +322,6 @@ function collisionEffect(brick,brickTab){
 			}		
 		}
 		brick.pv -= 1;
-		console.log(brick,brickTab);
 		brickDeath(brick,brickTab);
 		if(brick.pv > 0){
 			snd = new Audio("sound/rebond.wav");
