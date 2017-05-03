@@ -13,10 +13,13 @@ beginGame = 0;
 click_x = 0;
 click_y = 0;
 counterLevel = 0;
+chocolat = 0;
+endGameCounter = 0;
 startEvent = false;
 clickStart = false;
 level1 = false;
-level2 = false;
+endLevel = false;
+looseGameCount = false;
 
 vbX = Math.round(Math.random()* 6);
 vbY = Math.round(Math.random()* -6);
@@ -25,11 +28,16 @@ background = new Image();
 spaceship = new Image();
 ball = new Image();
 start = new Image();
+over = new Image();
+
+musicLevel = new Audio("sound/celestial.mp3");
+triple = new Audio("sound/triple.mp3");
 
 background.src = "img/background.png";
 spaceship.src = "img/spaceship2.png";
 start.src = "img/start.png";
 ball.src = "img/ball1.png";
+over.src = "img/gameOver.png";
 
 let mouseX;
 let mouseY;
@@ -37,16 +45,53 @@ let mouseY;
 blc = {};
 ship = {};
 st = {};
+gm = {};
 
 // brickpositionLevel1 = 	[[[400,200],[450,200],[500,200],[550,200]],
 // 				 		[[400,220],[450,220],[500,220],[550,220]],
 // 				 		[[400,240],[450,240],[500,240],[550,240]],
 // 				 		[[400,260],[450,260],[500,260],[550,260]]];
 
-brickpositionLevel1 = 	[[[400,200],[450,200],[500,200],[550,200],
-				 		[400,220],[450,220],[500,220],[550,220],
-				 		[400,240],[450,240],[500,240],[550,240],
-				 		[400,260],[450,260],[500,260],[550,260]]];
+//brickpositionLevel1 = 	[[[400,200],[450,200]]],
+
+brickpositionLevel1 = 	[[[0,240],[50,240],[100,240],[150,240],[200,240],[250,240],[300,240],[350,240],
+						[400,240],[450,240],[500,240],[550,240],[600,240],[650,240],[700,240],[750,240],
+						[800,240],[850,240],[900,240],[950,240],[0,260],[50,260],[100,260],[150,260],
+						[200,260],[250,260],[300,260],[350,260],
+						[400,260],[450,260],[500,260],[550,260],[600,260],[650,260],[700,260],[750,260],
+						[800,260],[850,260],[900,260],[950,260],[0,280],[50,280],[100,280],[150,280],
+						[200,280],[250,280],[300,280],[350,280],
+						[400,280],[450,280],[500,280],[550,280],[600,280],[650,280],[700,280],[750,280],
+						[800,280],[850,280],[900,280],[950,280],[0,300],[50,300],[100,300],[150,300],
+						[200,300],[250,300],[300,300],[350,300],
+						[400,300],[450,300],[500,300],[550,300],[600,300],[650,300],[700,300],[750,300],
+						[800,300],[850,300],[900,300],[950,300]],
+						[[0,220],[50,220],[100,220],[150,220],[200,220],[250,220],[300,220],[350,220],
+						[400,220],[450,220],[500,220],[550,220],[600,220],[650,220],[700,220],[750,220],
+						[800,220],[850,220],[900,220],[950,220],[0,200],[50,200],[100,200],[150,200],
+						[200,200],[250,200],[300,200],[350,200],
+						[400,200],[450,200],[500,200],[550,200],[600,200],[650,200],[700,200],[750,200],
+						[800,200],[850,200],[900,200],[950,200],[0,180],[50,180],[100,180],[150,180],
+						[200,180],[250,180],[300,180],[350,180],
+						[400,180],[450,180],[500,180],[550,180],[600,180],[650,180],[700,180],[750,180],
+						[800,180],[850,180],[900,180],[950,180],[0,160],[50,160],[100,160],[150,160],
+						[200,160],[250,160],[300,160],[350,160],
+						[400,160],[450,160],[500,160],[550,160],[600,160],[650,160],[700,160],[750,160],
+						[800,160],[850,160],[900,160],[950,160]],[[0,140],[50,140],[100,140],[150,140],[200,140],
+						[250,140],[300,140],[350,140],
+						[400,140],[450,140],[500,140],[550,140],[600,140],[650,140],[700,140],[750,140],
+						[800,140],[850,140],[900,140],[950,140],[0,120],[50,120],[100,120],[150,120],
+						[200,120],[250,120],[300,120],[350,120],
+						[400,120],[450,120],[500,120],[550,120],[600,120],[650,120],[700,120],[750,120],
+						[800,120],[850,120],[900,120],[950,120]],[[0,100],[50,100],[100,100],[150,100],[200,100],
+						[250,100],[300,100],[350,100],
+						[400,100],[450,100],[500,100],[550,100],[600,100],[650,100],[700,100],[750,100],
+						[800,100],[850,100],[900,100],[950,100],[0,80],[50,80],[100,80],[150,80],
+						[200,80],[250,80],[300,80],[350,80],
+						[400,80],[450,80],[500,80],[550,80],[600,80],[650,80],[700,80],[750,80],
+						[800,80],[850,80],[900,80],[950,80]]];
+
+
 
 brickpositionLevel2 = [[[400,200],[450,200],[500,200],[550,200],[400,220],[550,220],
 						[400,240],[550,240],[400,260],[450,260],[500,260],[550,260]],
@@ -59,6 +104,11 @@ bricktableLevel2 = [];
 function initSt(){
 	st.x = 0;
 	st.y = 0;
+}
+
+function initGm(){
+	gm.x = 0;
+	gm.y = 0;
 }
 
 function ballRotation(){
@@ -205,7 +255,7 @@ function sauvageInit(){
 
 function souris(e){
 	if (e.x != undefined && e.y != undefined){
-		mouseX = e.x - 460 - (ship.w/2);
+		mouseX = e.x - 210 - (ship.w/2);
 		mouseY = e.y;
 	}
 	else {
@@ -221,8 +271,65 @@ function getPosition(event){
 	Click_y = event.y;
 	Click_x -= canvas.offsetLeft;
 	Click_y -= canvas.offsetTop;
+	if(collisions(gm, ship)&& !startEvent && looseGameCount){
+		H = 500;
+		W = 1000;
+		score = 0;
+		timePoint = 0;
+		life = 3;
+		launcher = 0;
+		musicTime = 0;
+		ballRot = 1;
+		beginGame = 0;
+		click_x = 0;
+		click_y = 0;
+		counterLevel = 0;
+		startEvent = false;
+		clickStart = false;
+		level1 = false;
+		endScreen = false;
+		looseGameCount = false;
 
-	if(collisions(st, ship) && !startEvent){
+		vbX = Math.round(Math.random()* 6);
+		vbY = Math.round(Math.random()* -6);
+
+		background = new Image();
+		spaceship = new Image();
+		ball = new Image();
+		start = new Image();
+		over = new Image();
+
+		musicLevel = new Audio("sound/celestial.mp3");
+
+		background.src = "img/background.png";
+		spaceship.src = "img/spaceship2.png";
+		start.src = "img/start.png";
+		ball.src = "img/ball1.png";
+		over.src = "img/gameOver.png";
+
+		let mouseX;
+		let mouseY;
+
+		blc = {};
+		ship = {};
+		st = {};
+		gm = {};
+
+		brickpositionLevel1 = 	[[[400,200],[450,200],[500,200],[550,200],
+				 				[400,220],[450,220],[500,220],[550,220],
+				 				[400,240],[450,240],[500,240],[550,240],
+				 				[400,260],[450,260],[500,260],[550,260]]];
+
+		brickpositionLevel2 = [[[400,200],[450,200],[500,200],[550,200],[400,220],[550,220],
+								[400,240],[550,240],[400,260],[450,260],[500,260],[550,260]],
+								[[450,240]],[[450,220],[500,240]],[[500,220]]];
+
+		bricktableLevel1 = [];
+
+		bricktableLevel2 = [];
+		init();
+	}
+	if(collisions(st, ship) && !startEvent && !looseGameCount){
 		clickStart = true;
 	}
 }
@@ -287,6 +394,7 @@ function brickDeath(brick,tab){
 		brick.w = 0;
 		for(let i = 0; i < tab.length; i++){
 			if(brick.x === tab[i][1] && brick.y === tab[i][2]){
+				tab[i][0].src = "";
 				tab[i][1] = 100000;
 				tab[i][2] = 100000;
 				brick.x = 100000;
@@ -299,27 +407,21 @@ function brickDeath(brick,tab){
 function collisionEffect(brick,brickTab){	
 	if(collisions(brick,blc)){
 		score += 100;
-		if(blc.y <= brick.y + (brick.h/2)){
-			blc.y = blc.y - 13;
+		if(blc.y <= brick.y - (brick.h/2)){
+			blc.y = brick.y - blc.h - 1;
 			vbY *= -1;
 		}
-		else {
-			if(blc.y >= brick.y - (brick.h/2)){
-				blc.y = blc.y + 13;
-				vbY *= -1;
-			}
-			else {
-				if(blc.x < (brick.x + brick.w)){
-				  blc.x = blc.x - blc.w - 13;
-				  vbX *= -1;
-				}
-				else{
-					if((blc.x + blc.w) > brick.x){
-					  blc.x = blc.x + 13;
-					  vbX *= -1;
-					}
-				}
-			}		
+		else if(blc.y >= brick.y + (brick.h/2)){
+			blc.y = brick.y + brick.h - 1;
+			vbY *= -1;
+		}
+		else if(blc.x < brick.x){
+		    blc.x = brick.x - blc.w - 1;
+		    vbX *= -1;
+		}
+		else if(blc.x > brick.x){
+		  blc.x = brick.x + brick.w + 1;
+		  vbX *= -1;
 		}
 		brick.pv -= 1;
 		brickDeath(brick,brickTab);
@@ -430,7 +532,6 @@ function gainPoint(){
 }
 
 function mainMusic() {
-	musicLevel = new Audio("sound/celestial.mp3");
 	if(musicTime === 0){
 	musicLevel.play();
 	}
@@ -503,6 +604,15 @@ function looseLife(){
 	}
 }
 
+function looseGame(){
+	if(life <= 0){
+		musicLevel.pause();
+		musicLevel.currentTIme = 0;
+		startEvent = false;
+		looseGameCount = true;
+	}
+}
+
 function drawScore(){
 	CONTEXT.fillStyle = "lightblue";
 	CONTEXT.font = "24px Sans-Serif";
@@ -517,6 +627,7 @@ function init(){
 	initShip();
 	sauvageInit();
 	initVariousParameters();
+	initGm();
 }
 
 function bckRender(){
@@ -541,7 +652,11 @@ function startRender(){
 	CONTEXT.drawImage(start,st.x,st.y);
 }
 
-function winLevel(tab){
+function GmOvRender(){
+	CONTEXT.drawImage(over,gm.x,gm.y);
+}
+
+function winGame(tab){
 	let isSame = true;
 	for (let i = 1; isSame && i < tab.length; i++) {
 		isSame = ((tab[0][1] === tab[0][2]) && (tab[0][1] === tab[i][1]));
@@ -551,23 +666,38 @@ function winLevel(tab){
 	}
 	if(isSame){
 		level1 = false;
-		level2 = true;
+		triple.currentTime = 4;
+		triple.play();
+		musicLevel.pause();
+		startEvent = false;
+		endLevel = true;
+	}
+}
+
+function endOfGame(){
+	if(endLevel){
+		endGameCounter++;
+		if(endGameCounter === 300){
+			triple.pause();
+		}
 	}
 }
 
 function fullRender(){
 	bckRender();
-	startRender();
+	if(!startEvent && !looseGameCount){
+		startRender();
+	}
 	shiprender();
+	if(!startEvent && looseGameCount){
+		GmOvRender();
+	}
 	if(startEvent){
 		ballrender();
 		drawScore();
 		lifeRender();
 		if(level1){
 			brickrender(bricktableLevel1);
-		}
-		if(level2){
-			brickrender(bricktableLevel2);
 		}
 	}
 }
@@ -584,11 +714,7 @@ function game(){
 		if(level1){
 			packOfCollisionEffect(brickpositionLevel1,1);
 			brickDesign(brickpositionLevel1,1);
-			winLevel(bricktableLevel1);
-		}
-		if(level2){
-			packOfCollisionEffect(brickpositionLevel2,2);
-			brickDesign(brickpositionLevel2,2);
+			winGame(bricktableLevel1);
 		}
 	}
 }
@@ -596,6 +722,8 @@ function game(){
 function main(){
 	gameLauncher();
 	game();
+	looseGame();
+	endOfGame();
 	fullRender();
 }
 
