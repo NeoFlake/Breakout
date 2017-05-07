@@ -31,7 +31,6 @@ start = new Image();
 over = new Image();
 
 musicLevel = new Audio("sound/celestial.mp3");
-triple = new Audio("sound/triple.mp3");
 
 background.src = "img/background.png";
 spaceship.src = "img/spaceship2.png";
@@ -55,10 +54,6 @@ brickpositionLevel1 = 	[[[400,200],[450,200],[500,200],[550,200],
 brickpositionLevel2 = [[[400,200],[450,200],[500,200],[550,200],[400,220],[550,220],
 						[400,240],[550,240],[400,260],[450,260],[500,260],[550,260]],
 						[[450,240]],[[450,220],[500,240]],[[500,220]]];
-
-bricktableLevel1 = [];
-
-bricktableLevel2 = [];
 
 function initSt(){
 	st.x = 0;
@@ -206,10 +201,8 @@ createBrick(brickpositionLevel2,2);
 function sauvageInit(){
 	packOfSpriteDimension(brickpositionLevel1,1);
 	initBrick(brickpositionLevel1,1);
-	createBrickTable(brickpositionLevel1,bricktableLevel1,1);
 	packOfSpriteDimension(brickpositionLevel2,2);
 	initBrick(brickpositionLevel2,2);
-	createBrickTable(brickpositionLevel2,bricktableLevel2,2);
 }
 
 function souris(e){
@@ -230,64 +223,6 @@ function getPosition(event){
 	Click_y = event.y;
 	Click_x -= canvas.offsetLeft;
 	Click_y -= canvas.offsetTop;
-	if(collisions(gm, ship)&& !startEvent && looseGameCount){
-		H = 500;
-		W = 1000;
-		score = 0;
-		timePoint = 0;
-		life = 3;
-		launcher = 0;
-		musicTime = 0;
-		ballRot = 1;
-		beginGame = 0;
-		click_x = 0;
-		click_y = 0;
-		counterLevel = 0;
-		startEvent = false;
-		clickStart = false;
-		level1 = false;
-		endScreen = false;
-		looseGameCount = false;
-
-		vbX = Math.round(Math.random()* 6);
-		vbY = Math.round(Math.random()* -6);
-
-		background = new Image();
-		spaceship = new Image();
-		ball = new Image();
-		start = new Image();
-		over = new Image();
-
-		musicLevel = new Audio("sound/celestial.mp3");
-
-		background.src = "img/background.png";
-		spaceship.src = "img/spaceship2.png";
-		start.src = "img/start.png";
-		ball.src = "img/ball1.png";
-		over.src = "img/gameOver.png";
-
-		let mouseX;
-		let mouseY;
-
-		blc = {};
-		ship = {};
-		st = {};
-		gm = {};
-
-		brickpositionLevel1 = 	[[[400,200],[450,200],[500,200],[550,200],
-				 				[400,220],[450,220],[500,220],[550,220],
-				 				[400,240],[450,240],[500,240],[550,240],
-				 				[400,260],[450,260],[500,260],[550,260]]];
-
-		brickpositionLevel2 = [[[400,200],[450,200],[500,200],[550,200],[400,220],[550,220],
-								[400,240],[550,240],[400,260],[450,260],[500,260],[550,260]],
-								[[450,240]],[[450,220],[500,240]],[[500,220]]];
-
-		bricktableLevel1 = [];
-
-		bricktableLevel2 = [];
-		init();
-	}
 	if(collisions(st, ship) && !startEvent && !looseGameCount){
 		clickStart = true;
 	}
@@ -308,19 +243,6 @@ function initVariousParameters(){
 	CANVAS.addEventListener("mousedown", getPosition, false);
 	let canevas = document.getElementById("canvas");
 	canevas.style.cursor = 'none';
-}
-
-function createBrickTable(tab,finalTab,level){
-	memoryLength = 0;
-	for(let i = 0; i < tab.length; i++){
-		for(let j = 0; j < tab[i].length; j++){
-			let tempoTab = [];
-			let fnName = "tempoTab.push(brick" + ((level * 1000) + (i + memoryLength)) + "); tempoTab.push(brk" + ((level * 1000) + (i + memoryLength)) + ".x); tempoTab.push(brk" + ((level * 1000) + (i + memoryLength)) + ".y);";
-			eval(fnName);
-			finalTab.push(tempoTab);
-			memoryLength++;
-		}
-	}
 }
 
 function ballInit(){
@@ -352,12 +274,13 @@ function brickDeath(brick,tab){
 		brick.h = 0;
 		brick.w = 0;
 		for(let i = 0; i < tab.length; i++){
-			if(brick.x === tab[i][1] && brick.y === tab[i][2]){
-				tab[i][0].src = "";
-				tab[i][1] = 100000;
-				tab[i][2] = 100000;
-				brick.x = 100000;
-				brick.y = 100000;
+			for(let j = 0; j < tab[i].length; j++){
+				if(brick.x === tab[i][j][0] && brick.y === tab[i][j][1]){
+					tab[i][j][0] = 100000;
+					tab[i][j][1] = 100000;
+					brick.x = 100000;
+					brick.y = 100000;
+				}
 			}
 		}
 	}
@@ -505,7 +428,7 @@ function packOfCollisionEffect(tab,level){
 	memoryLength = 0;
 	for(let i = 0; i < tab.length; i++){
 		for(let j =0; j < tab[i].length; j++){
-			let fnName = "collisionEffect(brk" + ((level * 1000) + (i + memoryLength)) + ", bricktableLevel" + counterLevel + ");";
+			let fnName = "collisionEffect(brk" + ((level * 1000) + (i + memoryLength)) + ", brickpositionLevel" + counterLevel + ");";
 			eval(fnName);
 			memoryLength++;
 		}
@@ -601,9 +524,14 @@ function shiprender(){
 	CONTEXT.drawImage(spaceship,ship.x,ship.y);
 }
 
-function brickrender(tab){
+function brickrender(tab,level){
+	memoryLength = 0;
 	for(let i = 0; i < tab.length; i++){
-		CONTEXT.drawImage(tab[i][0],tab[i][1],tab[i][2]);
+		for(let j = 0; j < tab[i].length; j++){
+			let fnName = "CONTEXT.drawImage(brick" + ((level * 1000) + (i + memoryLength)) + ",brk" + ((level * 1000) + (i + memoryLength)) + ".x,brk" + ((level * 1000) + (i + memoryLength)) + ".y);";
+			eval(fnName);
+			memoryLength++;
+		}	
 	} 
 }
 
@@ -623,22 +551,8 @@ function winGame(tab){
 	if(!isSame){
 		return false;
 	}
-	if(isSame){
-		level1 = false;
-		triple.currentTime = 4;
-		triple.play();
-		musicLevel.pause();
-		startEvent = false;
-		endLevel = true;
-	}
-}
-
-function endOfGame(){
-	if(endLevel){
-		endGameCounter++;
-		if(endGameCounter === 300){
-			triple.pause();
-		}
+	else {
+		return true;
 	}
 }
 
@@ -656,7 +570,7 @@ function fullRender(){
 		drawScore();
 		lifeRender();
 		if(level1){
-			brickrender(bricktableLevel1);
+			brickrender(brickpositionLevel1,1);
 		}
 	}
 }
@@ -673,7 +587,7 @@ function game(){
 		if(level1){
 			packOfCollisionEffect(brickpositionLevel1,1);
 			brickDesign(brickpositionLevel1,1);
-			winGame(bricktableLevel1);
+			winGame(brickpositionLevel1);
 		}
 	}
 }
@@ -682,7 +596,6 @@ function main(){
 	gameLauncher();
 	game();
 	looseGame();
-	endOfGame();
 	fullRender();
 }
 
