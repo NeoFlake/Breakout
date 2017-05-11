@@ -547,13 +547,6 @@ function passLevel(tab,level){
 	}
 }
 
-function passTheLevel(tab,level){
-	if(winLevel(tab)){
-		let fnName = "level" + level + "= false; level" + (level + 1) + "= true;";
-		eval(fnName);
-	}
-}
-
 function fullRender(){
 	bckRender();
 	startRender();
