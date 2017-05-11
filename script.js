@@ -26,15 +26,11 @@ background = new Image();
 spaceship = new Image();
 ball = new Image();
 start = new Image();
-over = new Image();
-
-musicLevel = new Audio("sound/celestial.mp3");
 
 background.src = "img/background.png";
 spaceship.src = "img/spaceship2.png";
 start.src = "img/start.png";
 ball.src = "img/ball1.png";
-over.src = "img/gameOver.png";
 
 let mouseX;
 let mouseY;
@@ -42,7 +38,6 @@ let mouseY;
 blc = {};
 ship = {};
 st = {};
-gm = {};
 
 brickpositionLevel1 = 	[[[400,200],[450,200]]];
 
@@ -53,11 +48,6 @@ brickpositionLevel2 = [[[400,200],[450,200],[500,200],[550,200],[400,220],[550,2
 function initSt(){
 	st.x = 0;
 	st.y = 0;
-}
-
-function initGm(){
-	gm.x = 0;
-	gm.y = 0;
 }
 
 function ballRotation(){
@@ -202,7 +192,7 @@ function sauvageInit(){
 
 function souris(e){
 	if (e.x != undefined && e.y != undefined){
-		mouseX = e.x - 210 - (ship.w/2);
+		mouseX = e.x - (ship.w / 2);
 		mouseY = e.y;
 	}
 	else {
@@ -218,7 +208,8 @@ function getPosition(event){
 	Click_y = event.y;
 	Click_x -= canvas.offsetLeft;
 	Click_y -= canvas.offsetTop;
-	if(collisions(st, ship) && !startEvent && !looseGameCount){
+
+	if(collisions(st, ship) && !startEvent){
 		clickStart = true;
 	}
 }
@@ -277,7 +268,7 @@ function brickDeath(brick,brickimg,tab){
 					brick.y = 100000;
 					brickimg.src = "";
 				}
-			}
+			} 
 		}
 	}
 }
@@ -285,21 +276,27 @@ function brickDeath(brick,brickimg,tab){
 function collisionEffect(brick,brickimg,brickTab){	
 	if(collisions(brick,blc)){
 		score += 100;
-		if(blc.y <= brick.y - (brick.h/2)){
-			blc.y = brick.y - blc.h - 1;
+		if(blc.y <= brick.y + (brick.h/2)){
+			blc.y = blc.y - 13;
 			vbY *= -1;
 		}
-		else if(blc.y >= brick.y + (brick.h/2)){
-			blc.y = brick.y + brick.h - 1;
-			vbY *= -1;
-		}
-		else if(blc.x < brick.x){
-		    blc.x = brick.x - blc.w - 1;
-		    vbX *= -1;
-		}
-		else if(blc.x > brick.x){
-		  blc.x = brick.x + brick.w + 1;
-		  vbX *= -1;
+		else {
+			if(blc.y >= brick.y - (brick.h/2)){
+				blc.y = blc.y + 13;
+				vbY *= -1;
+			}
+			else {
+				if(blc.x < (brick.x + brick.w)){
+				  blc.x = blc.x - blc.w - 13;
+				  vbX *= -1;
+				}
+				else{
+					if((blc.x + blc.w) > brick.x){
+					  blc.x = blc.x + 13;
+					  vbX *= -1;
+					}
+				}
+			}		
 		}
 		brick.pv -= 1;
 		brickDeath(brick,brickimg,brickTab);
@@ -410,6 +407,7 @@ function gainPoint(){
 }
 
 function mainMusic() {
+	musicLevel = new Audio("sound/celestial.mp3");
 	if(musicTime === 0){
 	musicLevel.play();
 	}
@@ -482,15 +480,6 @@ function looseLife(){
 	}
 }
 
-function looseGame(){
-	if(life <= 0){
-		musicLevel.pause();
-		musicLevel.currentTIme = 0;
-		startEvent = false;
-		looseGameCount = true;
-	}
-}
-
 function drawScore(){
 	CONTEXT.fillStyle = "lightblue";
 	CONTEXT.font = "24px Sans-Serif";
@@ -505,7 +494,6 @@ function init(){
 	initShip();
 	sauvageInit();
 	initVariousParameters();
-	initGm();
 }
 
 function bckRender(){
@@ -527,7 +515,7 @@ function brickrender(tab,level){
 			let fnName = "if(brk" + ((level * 1000) + (i + memoryLength)) + ".pv > 0){CONTEXT.drawImage(brick" + ((level * 1000) + (i + memoryLength)) + ",brk" + ((level * 1000) + (i + memoryLength)) + ".x,brk" + ((level * 1000) + (i + memoryLength)) + ".y);}";
 			eval(fnName);
 			memoryLength++;
-		}	
+		}
 	} 
 }
 
@@ -559,15 +547,17 @@ function passLevel(tab,level){
 	}
 }
 
+function passTheLevel(tab,level){
+	if(winLevel(tab)){
+		let fnName = "level" + level + "= false; level" + (level + 1) + "= true;";
+		eval(fnName);
+	}
+}
+
 function fullRender(){
 	bckRender();
-	if(!startEvent && !looseGameCount){
-		startRender();
-	}
+	startRender();
 	shiprender();
-	if(!startEvent && looseGameCount){
-		GmOvRender();
-	}
 	if(startEvent){
 		ballrender();
 		drawScore();
