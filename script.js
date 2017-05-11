@@ -192,8 +192,8 @@ function sauvageInit(){
 
 function souris(e){
 	if (e.x != undefined && e.y != undefined){
-		mouseX = e.x - (ship.w / 2);
-		mouseY = e.y;
+		mouseX = (e.x -= CANVAS.offsetLeft) - (ship.w / 2);
+		mouseY = (e.y -= CANVAS.offsetLeft);
 	}
 	else {
 	// Firefox patch
@@ -555,11 +555,15 @@ function fullRender(){
 		ballrender();
 		drawScore();
 		lifeRender();
-		if(counterLevel === 1){
-			brickrender(brickpositionLevel1,1);
-		}
-		if(counterLevel === 2){
-			brickrender(brickpositionLevel2,2);
+		switch(counterLevel){
+			case 1:
+				brickrender(brickpositionLevel1,1);
+				break;
+			case 2:
+				brickrender(brickpositionLevel2,2);
+				break;
+			default:
+				break;
 		}
 	}
 }
