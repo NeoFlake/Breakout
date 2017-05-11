@@ -13,11 +13,9 @@ beginGame = 0;
 click_x = 0;
 click_y = 0;
 counterLevel = 0;
-chocolat = 0;
 endGameCounter = 0;
 startEvent = false;
 clickStart = false;
-level1 = false;
 endLevel = false;
 looseGameCount = false;
 
@@ -46,10 +44,7 @@ ship = {};
 st = {};
 gm = {};
 
-brickpositionLevel1 = 	[[[400,200],[450,200],[500,200],[550,200],
-				 		[400,220],[450,220],[500,220],[550,220],
-				 		[400,240],[450,240],[500,240],[550,240],
-				 		[400,260],[450,260],[500,260],[550,260]]];
+brickpositionLevel1 = 	[[[400,200],[450,200]]];
 
 brickpositionLevel2 = [[[400,200],[450,200],[500,200],[550,200],[400,220],[550,220],
 						[400,240],[550,240],[400,260],[450,260],[500,260],[550,260]],
@@ -191,7 +186,7 @@ function initBrick(tab,level){
 	}
 }
 
-function preInit(){
+function brickInit(){
 brickImage(brickpositionLevel1,1);
 createBrick(brickpositionLevel1,1);
 brickImage(brickpositionLevel2,2);
@@ -268,7 +263,7 @@ function collisions(A,B) {
 	return true;
 }
 
-function brickDeath(brick,tab){
+function brickDeath(brick,brickimg,tab){
 	if(brick.pv <= 0) {
 		score += 1000;
 		brick.h = 0;
@@ -280,13 +275,14 @@ function brickDeath(brick,tab){
 					tab[i][j][1] = 100000;
 					brick.x = 100000;
 					brick.y = 100000;
+					brickimg.src = "";
 				}
 			}
 		}
 	}
 }
 
-function collisionEffect(brick,brickTab){	
+function collisionEffect(brick,brickimg,brickTab){	
 	if(collisions(brick,blc)){
 		score += 100;
 		if(blc.y <= brick.y - (brick.h/2)){
@@ -306,7 +302,7 @@ function collisionEffect(brick,brickTab){
 		  vbX *= -1;
 		}
 		brick.pv -= 1;
-		brickDeath(brick,brickTab);
+		brickDeath(brick,brickimg,brickTab);
 		if(brick.pv > 0){
 			snd = new Audio("sound/rebond.wav");
 			snd.play();
@@ -428,7 +424,7 @@ function packOfCollisionEffect(tab,level){
 	memoryLength = 0;
 	for(let i = 0; i < tab.length; i++){
 		for(let j =0; j < tab[i].length; j++){
-			let fnName = "collisionEffect(brk" + ((level * 1000) + (i + memoryLength)) + ", brickpositionLevel" + counterLevel + ");";
+			let fnName = "if(brk" + ((level * 1000) + (i + memoryLength)) + ".pv > 0){collisionEffect(brk" + ((level * 1000) + (i + memoryLength)) + ",brick" + ((level * 1000) + (i + memoryLength)) + ", brickpositionLevel" + counterLevel + ");}";
 			eval(fnName);
 			memoryLength++;
 		}
@@ -528,7 +524,7 @@ function brickrender(tab,level){
 	memoryLength = 0;
 	for(let i = 0; i < tab.length; i++){
 		for(let j = 0; j < tab[i].length; j++){
-			let fnName = "CONTEXT.drawImage(brick" + ((level * 1000) + (i + memoryLength)) + ",brk" + ((level * 1000) + (i + memoryLength)) + ".x,brk" + ((level * 1000) + (i + memoryLength)) + ".y);";
+			let fnName = "if(brk" + ((level * 1000) + (i + memoryLength)) + ".pv > 0){CONTEXT.drawImage(brick" + ((level * 1000) + (i + memoryLength)) + ",brk" + ((level * 1000) + (i + memoryLength)) + ".x,brk" + ((level * 1000) + (i + memoryLength)) + ".y);}";
 			eval(fnName);
 			memoryLength++;
 		}	
@@ -543,16 +539,23 @@ function GmOvRender(){
 	CONTEXT.drawImage(over,gm.x,gm.y);
 }
 
-function winGame(tab){
-	let isSame = true;
-	for (let i = 1; isSame && i < tab.length; i++) {
-		isSame = ((tab[0][1] === tab[0][2]) && (tab[0][1] === tab[i][1]));
+function winLevel(tab,level){
+	bricksCleared = true;
+	memoryLength = 0;
+	for(let i = 0; i < tab.length; i++){
+		for(let j = 0; j < tab[i].length; j++){
+			let fnName = "if(brk" + ((level * 1000) + (i + memoryLength)) + ".pv > 0){bricksCleared = false;}";
+			eval(fnName);
+			memoryLength++;
+		}	
 	}
-	if(!isSame){
-		return false;
-	}
-	else {
-		return true;
+	return bricksCleared;
+}
+
+function passLevel(tab,level){
+	if(winLevel(tab,level)){
+		counterLevel ++;
+		console.log(counterLevel);
 	}
 }
 
@@ -569,8 +572,11 @@ function fullRender(){
 		ballrender();
 		drawScore();
 		lifeRender();
-		if(level1){
+		if(counterLevel === 1){
 			brickrender(brickpositionLevel1,1);
+		}
+		if(counterLevel === 2){
+			brickrender(brickpositionLevel2,2);
 		}
 	}
 }
@@ -584,10 +590,15 @@ function game(){
 		gainPoint();
 		looseLife();
 		mainMusic();
-		if(level1){
+		if(counterLevel === 1){
 			packOfCollisionEffect(brickpositionLevel1,1);
 			brickDesign(brickpositionLevel1,1);
-			winGame(brickpositionLevel1);
+			passLevel(brickpositionLevel1,1);
+		}
+		if(counterLevel === 2){
+			packOfCollisionEffect(brickpositionLevel2,2);
+			brickDesign(brickpositionLevel2,2);
+			passLevel(brickpositionLevel2,2);
 		}
 	}
 }
@@ -595,11 +606,10 @@ function game(){
 function main(){
 	gameLauncher();
 	game();
-	looseGame();
 	fullRender();
 }
 
-preInit();
+brickInit();
 
 window.onload = function() {
 	init();
