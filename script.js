@@ -318,22 +318,22 @@ function shipCollision(){
 		snd.play();
 		}
 		if(((blc.x + (blc.w / 2) -1) >= ship.x) && ((blc.x + (blc.w / 2) -1) <= ship.x + (ship.w / 5) -1)){
-			if(vbY > 0){
-				if(vbX < 0){
-					vbY *= -.5;
-					if(vbX > -6){
-						vbX *= 1.25;
-					}
-				}
-				if(vbX > 0){
-					vbY *= -.75;
-					if(vbX < 6){
-						vbX *= -1.25;
-					}
-				}
+			if(vbX < 0 && vbX > -6){
+				vbX -= 1;
 			}
-			if(vbY === 0){
-				vbY = -2;
+			else if(vbX > 0 && vbX < 6){
+				vbX = (vbX * -1) -1;
+			}
+			else {
+				vbX = -2;
+			}
+			if(vbY > 0){
+				if(vbY < 4){
+					vbY *= -1;
+				}
+				else if(vbY >= 4){
+					vbY = (vbY * -1) +1;
+				}
 			}
 		}
 		if(((blc.x + (blc.w / 2) -1) > ship.x + (ship.w / 5) -1) && ((blc.x + (blc.w / 2) -1) <= ship.x + ((ship.w * 2) / 5 -1))){
@@ -346,25 +346,17 @@ function shipCollision(){
 			}
 		}
 		if(((blc.x + (blc.w / 2) -1) > ship.x + (((ship.w * 2) / 5) -1)) && ((blc.x + (blc.w / 2) -1) <= ship.x + (((ship.w * 3) / 5) -1))){
-			if(vbX < 0){
-				vbX *= .5;
-				if(vbY < 6){
-					vbY *= -1.5;
-				}
-			}
-			if(vbX === 0){
-				if(vbY < 3){
-					vbY *= -2;
-				}
-				else if(vbY < 5){
-					vbY *= -1.5;
-				}
-			}
 			if(vbX > 0){
-				vbX *= .5;
-				if(vbY < 6){
-					vbY *= -1.5;
-				}
+				vbX -= 1;
+			}
+			else if(vbX < 0){
+				vbX += 1;
+			}
+			if(vbY < 6){
+				vbY = (vbY * -1) -1;
+			}
+			else {
+				vbY *= -1;
 			}
 		}
 		if(((blc.x + (blc.w / 2) -1) > ship.x + (((ship.w * 3) / 5) -1)) && ((blc.x + (blc.w / 2) -1) <= ship.x + (((ship.w * 4) / 5) -1))){
@@ -377,22 +369,22 @@ function shipCollision(){
 			}
 		}
 		if(((blc.x + (blc.w / 2) -1) > ship.x + (((ship.w * 4) / 5) -1)) && ((blc.x + (blc.w / 2) -1) <= ship.x + ship.w - 1)){
-			if(vbY > 0){
-				if(vbX < 0){
-					vbY *= -.5;
-					if(vbX > -6){
-						vbX *= -1.25;
-					}
-				}
-				if(vbX > 0){
-					vbY *= -.75;
-					if(vbX < 6){
-						vbX *= 1.25;
-					}
-				}
+			if(vbX < 0 && vbX > -6){
+				vbX = (vbX * -1) +1;
 			}
-			if(vbY === 0){
-				vbY = -2;
+			else if(vbX > 0 && vbX < 6){
+				vbX += 1;
+			}
+			else {
+				vbX = 2;
+			}
+			if(vbY > 0){
+				if(vbY < 4){
+					vbY *= -1;
+				}
+				else if(vbY >= 4){
+					vbY = (vbY * -1) +1;
+				}
 			}
 		}
 	}
@@ -410,6 +402,7 @@ function mainMusic() {
 	musicLevel = new Audio("sound/celestial.mp3");
 	if(musicTime === 0){
 	musicLevel.play();
+	musicLevel.volume = 0.4;
 	}
 	musicTime++;
 	if(musicTime === 10600){
@@ -433,11 +426,13 @@ function bouncingBall(){
 	if(blc.x < 0 || blc.x > 992){
 		snd = new Audio("sound/rebond.wav");
 		snd.play();
+		snd.volume = 0.7;
 		vbX *= -1;
 	}
 	if(blc.y < 0 || blc.y > 492){
 		snd = new Audio("sound/rebond.wav");
 		snd.play();
+		snd.volume = 0.7;
 		vbY *= -1;
 	}
 }
@@ -460,6 +455,7 @@ function looseLife(){
 	if(blc.y > 490){
 		snd = new Audio("sound/wilhelm.wav");
 		snd.play();
+		snd.volume = 0.7;
 		life -= 1;
 		blc.y = ship.y - 13;
 		blc.x = ship.x + (ship.w/2);
