@@ -19,8 +19,8 @@ clickStart = false;
 endLevel = false;
 looseGameCount = false;
 
-vbX = Math.round(Math.random()* 6);
-vbY = Math.round(Math.random()* -6);
+vbX = 0;
+vbY = 0;
 
 background = new Image();
 spaceship = new Image();
@@ -214,6 +214,17 @@ function getPosition(event){
 	}
 }
 
+function moveShip(e){
+	if(e.keyCode === 37 && startEvent){
+		e.preventDefault();
+		ship.x -= 10;
+	}
+	if(e.keyCode === 39 && startEvent){
+		e.preventDefault();
+		ship.x += 10;
+	}
+}
+
 function gameLauncher() {
 	if(clickStart){
 		startEvent = true;
@@ -227,13 +238,14 @@ function gameLauncher() {
 function initVariousParameters(){
 	CANVAS.addEventListener("mousemove", souris, false);
 	CANVAS.addEventListener("mousedown", getPosition, false);
+	window.addEventListener("keydown", moveShip, false);
 	let canevas = document.getElementById("canvas");
 	canevas.style.cursor = 'none';
 }
 
 function ballInit(){
+	blc.y = 400;
 	blc.x = 500;
-	blc.y = 350;
 	blc.h = ball.height;
 	blc.w = ball.width;
 }
@@ -311,40 +323,42 @@ function collisionEffect(brick,brickimg,brickTab){
 	}
 }
 
-function shipCollision(){
-	if(collisions(ship,blc)){
-		if(launcher != 1){
-		snd = new Audio("sound/rebond.wav");
-		snd.play();
+function leftShipCollision(){
+	if(((blc.x + (blc.w / 2) -1) >= ship.x) && ((blc.x + (blc.w / 2) -1) <= ship.x + (ship.w / 5) -1)){
+		if(vbX < 0 && vbX > -6){
+			vbX -= 1;
 		}
-		if(((blc.x + (blc.w / 2) -1) >= ship.x) && ((blc.x + (blc.w / 2) -1) <= ship.x + (ship.w / 5) -1)){
-			if(vbX < 0 && vbX > -6){
-				vbX -= 1;
+		else if(vbX > 0 && vbX < 6){
+			vbX = (vbX * -1) -1;
+		}
+		else {
+			vbX = -2;
+		}
+		if(vbY > 0){
+			if(vbY < 4){
+				vbY *= -1;
 			}
-			else if(vbX > 0 && vbX < 6){
-				vbX = (vbX * -1) -1;
-			}
-			else {
-				vbX = -2;
-			}
-			if(vbY > 0){
-				if(vbY < 4){
-					vbY *= -1;
-				}
-				else if(vbY >= 4){
-					vbY = (vbY * -1) +1;
-				}
+			else if(vbY >= 4){
+				vbY = (vbY * -1) +1;
 			}
 		}
-		if(((blc.x + (blc.w / 2) -1) > ship.x + (ship.w / 5) -1) && ((blc.x + (blc.w / 2) -1) <= ship.x + ((ship.w * 2) / 5 -1))){
-			vbY *= -1;
-			if(vbX < 0){
-				vbX *= 1;
-			}
-			if(vbX > 0){
-				vbX *= -1;
-			}
+	}
+}
+
+function middleLeftShipCollision(){
+	if(((blc.x + (blc.w / 2) -1) > ship.x + (ship.w / 5) -1) && ((blc.x + (blc.w / 2) -1) <= ship.x + ((ship.w * 2) / 5 -1))){
+		vbY *= -1;
+		if(vbX < 0){
+			vbX *= 1;
 		}
+		if(vbX > 0){
+			vbX *= -1;
+		}
+	}
+}
+
+function middleShipCollision(){
+	if(launcher != 2){
 		if(((blc.x + (blc.w / 2) -1) > ship.x + (((ship.w * 2) / 5) -1)) && ((blc.x + (blc.w / 2) -1) <= ship.x + (((ship.w * 3) / 5) -1))){
 			if(vbX > 0){
 				vbX -= 1;
@@ -359,34 +373,54 @@ function shipCollision(){
 				vbY *= -1;
 			}
 		}
-		if(((blc.x + (blc.w / 2) -1) > ship.x + (((ship.w * 3) / 5) -1)) && ((blc.x + (blc.w / 2) -1) <= ship.x + (((ship.w * 4) / 5) -1))){
-			vbY *= -1;
-			if(vbX < 0){
-				vbX *= -1;
+	}
+}
+
+function middleRightShipCollision(){
+	if(((blc.x + (blc.w / 2) -1) > ship.x + (((ship.w * 3) / 5) -1)) && ((blc.x + (blc.w / 2) -1) <= ship.x + (((ship.w * 4) / 5) -1))){
+		vbY *= -1;
+		if(vbX < 0){
+			vbX *= -1;
+		}
+		if(vbX > 0){
+			vbX *= 1;
+		}
+	}
+}
+
+function rightShipCollision(){
+	if(((blc.x + (blc.w / 2) -1) > ship.x + (((ship.w * 4) / 5) -1)) && ((blc.x + (blc.w / 2) -1) <= ship.x + ship.w - 1)){
+		if(vbX < 0 && vbX > -6){
+			vbX = (vbX * -1) +1;
+		}
+		else if(vbX > 0 && vbX < 6){
+			vbX += 1;
+		}
+		else {
+			vbX = 2;
+		}
+		if(vbY > 0){
+			if(vbY < 4){
+				vbY *= -1;
 			}
-			if(vbX > 0){
-				vbX *= 1;
+			else if(vbY >= 4){
+				vbY = (vbY * -1) +1;
 			}
 		}
-		if(((blc.x + (blc.w / 2) -1) > ship.x + (((ship.w * 4) / 5) -1)) && ((blc.x + (blc.w / 2) -1) <= ship.x + ship.w - 1)){
-			if(vbX < 0 && vbX > -6){
-				vbX = (vbX * -1) +1;
-			}
-			else if(vbX > 0 && vbX < 6){
-				vbX += 1;
-			}
-			else {
-				vbX = 2;
-			}
-			if(vbY > 0){
-				if(vbY < 4){
-					vbY *= -1;
-				}
-				else if(vbY >= 4){
-					vbY = (vbY * -1) +1;
-				}
-			}
+	}
+}
+
+function shipCollisionManager(){
+	if(collisions(ship,blc)){
+		if(launcher != 1){
+		snd = new Audio("sound/rebond.wav");
+		snd.play();
 		}
+		leftShipCollision();
+		middleLeftShipCollision();
+		middleShipCollision();
+		middleRightShipCollision();
+		rightShipCollision();
 	}
 }
 
@@ -451,29 +485,57 @@ function lifeRender(){
 	}		
 }
 
+function stickTheBallOnTheShip(){
+	blc.y = ship.y - 13;
+	blc.x = ship.x + (ship.w/2);
+	vbX = 0;
+	vbY = 0;
+}
+
+function initialVector(){
+	vbX = Math.round(Math.random() * 4) + 2;
+	vbY = (Math.round(Math.random() * 4) + 2) * -1;
+	launcher = 0;
+}
+
+function ballLauncher(){
+	CANVAS.addEventListener("click", function(){launcher = 2;});
+	window.addEventListener("keydown", function(e){
+		if(e.keyCode === 32){
+			e.preventDefault();
+			launcher = 2;
+		}
+	});
+}
+
+function launcherOnPhaseOne(){
+	if(launcher === 1){
+		stickTheBallOnTheShip();
+		ballLauncher();
+	}
+}
+
+function launcherOnPhaseTwo(){
+	if(launcher === 2 && vbY === 0 && vbX === 0){
+		initialVector();
+	}
+}
+
+function launcherSwitch(){
+	launcherOnPhaseOne();
+	launcherOnPhaseTwo();
+}
+
 function looseLife(){
 	if(blc.y > 490){
 		snd = new Audio("sound/wilhelm.wav");
 		snd.play();
 		snd.volume = 0.7;
 		life -= 1;
-		blc.y = ship.y - 13;
-		blc.x = ship.x + (ship.w/2);
-		vbX = 0;
-		vbY = 0;
+		stickTheBallOnTheShip();
 		launcher = 1;
 	}
-	if(launcher === 2 && vbY === 0){
-		vbX = Math.random() * 4;
-		vbY = Math.random() * -4;
-	}
-	if(launcher === 1){
-		blc.y = ship.y - 13;
-		blc.x = ship.x + (ship.w/2);
-		vbX = 0;
-		vbY = 0;
-		setTimeout(function(){launcher = 2;}, 1000);
-	}
+	launcherSwitch();
 }
 
 function drawScore(){
@@ -490,6 +552,7 @@ function init(){
 	initShip();
 	sauvageInit();
 	initVariousParameters();
+	launcher = 1;
 }
 
 function bckRender(){
@@ -539,7 +602,7 @@ function winLevel(tab,level){
 function passLevel(tab,level){
 	if(winLevel(tab,level)){
 		counterLevel ++;
-		console.log(counterLevel);
+		launcher = 1;
 	}
 }
 
@@ -569,7 +632,7 @@ function game(){
 		ballRotation();
 		ballTravel();
 		bouncingBall();
-		shipCollision();
+		shipCollisionManager();
 		gainPoint();
 		looseLife();
 		mainMusic();
@@ -579,7 +642,9 @@ function game(){
 			passLevel(brickpositionLevel1,1);
 		}
 		if(counterLevel === 2){
-			packOfCollisionEffect(brickpositionLevel2,2);
+			if(launcher != 1){
+				packOfCollisionEffect(brickpositionLevel2,2);
+			}
 			brickDesign(brickpositionLevel2,2);
 			passLevel(brickpositionLevel2,2);
 		}
