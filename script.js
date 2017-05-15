@@ -23,11 +23,13 @@ vbX = 0;
 vbY = 0;
 
 background = new Image();
+star = new Image();
 spaceship = new Image();
 ball = new Image();
 start = new Image();
 
 background.src = "img/background.png";
+star.src = "img/star.png";
 spaceship.src = "img/spaceship2.png";
 start.src = "img/start.png";
 ball.src = "img/ball1.png";
@@ -36,6 +38,7 @@ let mouseX;
 let mouseY;
 
 blc = {};
+crsr = {}; 
 ship = {};
 st = {};
 
@@ -158,6 +161,13 @@ function brickDesign(tab,level){
 	}
 }
 
+function initStar(){
+	crsr.h = star.height;
+	crsr.w = star.width;
+	crsr.x = (W - crsr.w) / 2;
+	crsr.y = (H - crsr.h) /2;
+}
+
 function initShip(){
 	ship.h = spaceship.height;
 	ship.w = spaceship.width;
@@ -177,30 +187,32 @@ function initBrick(tab,level){
 }
 
 function brickInit(){
-brickImage(brickpositionLevel1,1);
-createBrick(brickpositionLevel1,1);
-brickImage(brickpositionLevel2,2);
-createBrick(brickpositionLevel2,2);
+	for(let i = 1; i < 3; i++){
+		brickImage(eval("brickpositionLevel" + i),i);
+		createBrick(eval("brickpositionLevel" + i),i);
+	}
 }
 
 function sauvageInit(){
-	packOfSpriteDimension(brickpositionLevel1,1);
-	initBrick(brickpositionLevel1,1);
-	packOfSpriteDimension(brickpositionLevel2,2);
-	initBrick(brickpositionLevel2,2);
+	for(let i = 1; i < 3; i++){
+		packOfSpriteDimension(eval("brickpositionLevel" + i),i);
+		initBrick(eval("brickpositionLevel" + i),i);
+	}
 }
 
 function souris(e){
 	if (e.x != undefined && e.y != undefined){
-		mouseX = (e.x -= CANVAS.offsetLeft) - (ship.w / 2);
-		mouseY = (e.y -= CANVAS.offsetLeft);
+		mouseX = (e.x -= CANVAS.offsetLeft);
+		mouseY = (e.y -= CANVAS.offsetTop);
 	}
 	else {
-	// Firefox patch
-	mouseX = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
-	mouseY = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
+		// Firefox patch
+		mouseX = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft;
+		mouseY = e.clientY + document.body.scrollTop + document.documentElement.scrollTop;
 	}
-	ship.x = mouseX;
+	ship.x = mouseX - (ship.w / 2);
+	crsr.x = mouseX - (crsr.w / 2);
+	crsr.y = mouseY - (crsr.h / 2);
 }
 
 function getPosition(event){
@@ -209,19 +221,27 @@ function getPosition(event){
 	Click_x -= canvas.offsetLeft;
 	Click_y -= canvas.offsetTop;
 
-	if(collisions(st, ship) && !startEvent){
+	if(collisions(st, crsr) && !startEvent){
 		clickStart = true;
 	}
 }
 
-function moveShip(e){
-	if(e.keyCode === 37 && startEvent){
-		e.preventDefault();
-		ship.x -= 10;
+function keyboardManager(e){
+	if(!startEvent){
+		if(e.keyCode === 13){
+			e.preventDefault();
+			clickStart = true;
+		}
 	}
-	if(e.keyCode === 39 && startEvent){
-		e.preventDefault();
-		ship.x += 10;
+	if(startEvent){
+		if(e.keyCode === 37){
+			e.preventDefault();
+			ship.x -= 10;
+		}
+		if(e.keyCode === 39){
+			e.preventDefault();
+			ship.x += 10;
+		}
 	}
 }
 
@@ -238,9 +258,8 @@ function gameLauncher() {
 function initVariousParameters(){
 	CANVAS.addEventListener("mousemove", souris, false);
 	CANVAS.addEventListener("mousedown", getPosition, false);
-	window.addEventListener("keydown", moveShip, false);
-	let canevas = document.getElementById("canvas");
-	canevas.style.cursor = 'none';
+	window.addEventListener("keydown", keyboardManager, false);
+	document.getElementById("canvas").style.cursor = 'none';
 }
 
 function ballInit(){
@@ -266,7 +285,7 @@ function collisions(A,B) {
 	return true;
 }
 
-function brickDeath(brick,brickimg,tab){
+function brickDeath(brick){
 	if(brick.pv <= 0) {
 		score += 1000;
 		brick.h = 0;
@@ -274,7 +293,7 @@ function brickDeath(brick,brickimg,tab){
 	}
 }
 
-function collisionEffect(brick,brickimg,brickTab){	
+function collisionEffect(brick){	
 	if(collisions(brick,blc)){
 		score += 100;
 		if(blc.y <= brick.y + (brick.h/2)){
@@ -300,7 +319,7 @@ function collisionEffect(brick,brickimg,brickTab){
 			}		
 		}
 		brick.pv -= 1;
-		brickDeath(brick,brickimg,brickTab);
+		brickDeath(brick);
 		if(brick.pv > 0){
 			snd = new Audio("sound/rebond.wav");
 			snd.play();
@@ -340,8 +359,11 @@ function middleLeftShipCollision(){
 		if(vbX < 0){
 			vbX *= 1;
 		}
-		if(vbX > 0){
+		else if(vbX > 0){
 			vbX *= -1;
+		}
+		else{
+			vbX = -1;
 		}
 	}
 }
@@ -371,8 +393,11 @@ function middleRightShipCollision(){
 		if(vbX < 0){
 			vbX *= -1;
 		}
-		if(vbX > 0){
+		else if(vbX > 0){
 			vbX *= 1;
+		}
+		else {
+			vbX = 1;
 		}
 	}
 }
@@ -438,7 +463,7 @@ function packOfCollisionEffect(tab,level){
 	memoryLength = 0;
 	for(let i = 0; i < tab.length; i++){
 		for(let j =0; j < tab[i].length; j++){
-			let fnName = "if(brk" + ((level * 1000) + (i + memoryLength)) + ".pv > 0){collisionEffect(brk" + ((level * 1000) + (i + memoryLength)) + ",brick" + ((level * 1000) + (i + memoryLength)) + ", brickpositionLevel" + counterLevel + ");}";
+			let fnName = "if(brk" + ((level * 1000) + (i + memoryLength)) + ".pv > 0){collisionEffect(brk" + ((level * 1000) + (i + memoryLength)) + ");}";
 			eval(fnName);
 			memoryLength++;
 		}
@@ -489,7 +514,7 @@ function initialVector(){
 
 function ballLauncher(){
 	CANVAS.addEventListener("click", function(){launcher = 2;});
-	window.addEventListener("keydown", function(e){
+	window.addEventListener("keypress", function(e){
 		if(e.keyCode === 32){
 			e.preventDefault();
 			launcher = 2;
@@ -538,6 +563,7 @@ function init(){
 	initCanvas();
 	initLife();
 	ballInit();
+	initStar();
 	initShip();
 	sauvageInit();
 	initVariousParameters();
@@ -571,6 +597,10 @@ function startRender(){
 	CONTEXT.drawImage(start,st.x,st.y);
 }
 
+function cursorRender(){
+	CONTEXT.drawImage(star,crsr.x,crsr.y);
+}
+
 function GmOvRender(){
 	CONTEXT.drawImage(over,gm.x,gm.y);
 }
@@ -598,8 +628,11 @@ function passLevel(tab,level){
 function fullRender(){
 	bckRender();
 	startRender();
-	shiprender();
+	if(!startEvent){
+		cursorRender();
+	}
 	if(startEvent){
+		shiprender();
 		ballrender();
 		drawScore();
 		lifeRender();
