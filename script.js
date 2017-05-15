@@ -17,6 +17,7 @@ startEvent = false;
 clickStart = false;
 level1 = false;
 level2 = false;
+level3 = false;
 levelcounter = 1;
 
 vbX = Math.round(Math.random()* 6);
@@ -192,7 +193,7 @@ function sauvageInit(){
 
 function souris(e){
 	if (e.x != undefined && e.y != undefined){
-		mouseX = e.x - (ship.w / 2);
+		mouseX = e.x - (ship.w / 2) - 200;
 		mouseY = e.y;
 	}
 	else {
@@ -264,11 +265,11 @@ function brickDeath(brick,tab){
 				if(brick.x === tab[i][j][0] && brick.y === tab[i][j][1]){
 					tab[i][j][0] = 100000;
 					tab[i][j][1] = 100000;
-					brick.x = 100000;
-					brick.y = 100000;
 				}
 			} 
 		}
+		brick.x = 100000;
+		brick.y = 100000;
 	}
 }
 
@@ -539,7 +540,7 @@ function winLevel(tab){
 
 function passTheLevel(tab,level){
 	if(winLevel(tab)){
-		let fnName = "level" + level + "= false; level" + (level + 1) + "= true;";
+		let fnName = "level" + level + "= false; level" + (level + 1) + "= true; brickpositionLevel" + level + "= [];";
 		eval(fnName);
 	}
 }
@@ -570,14 +571,18 @@ function game(){
 		gainPoint();
 		looseLife();
 		mainMusic();
-		if(level1 && !level2){
+		if(level1){
 			packOfCollisionEffect(brickpositionLevel1,1);
 			brickDesign(brickpositionLevel1,1);
 			passTheLevel(brickpositionLevel1,1);
 		}
-		if(level2 && !level1){
+		if(level2){
 			packOfCollisionEffect(brickpositionLevel2,2);
 			brickDesign(brickpositionLevel2,2);
+			passTheLevel(brickpositionLevel2,2);
+		}
+		if(level3){
+			console.log("Bonjour");
 		}
 	}
 }
