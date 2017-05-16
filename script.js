@@ -13,11 +13,13 @@ beginGame = 0;
 click_x = 0;
 click_y = 0;
 counterLevel = 0;
+interlevelOn = false;
 endGameCounter = 0;
 startEvent = false;
 clickStart = false;
 endLevel = false;
 looseGameCount = false;
+swtchInLvl = false;
 
 vbX = 0;
 vbY = 0;
@@ -28,11 +30,14 @@ spaceship = new Image();
 ball = new Image();
 start = new Image();
 
+interLevel1Screen = new Image();
+
 background.src = "img/background.png";
 star.src = "img/star.png";
 spaceship.src = "img/spaceship2.png";
 start.src = "img/start.png";
 ball.src = "img/ball1.png";
+interLevel1Screen.src = "img/interlevel.png";
 
 let mouseX;
 let mouseY;
@@ -41,6 +46,7 @@ blc = {};
 crsr = {}; 
 ship = {};
 st = {};
+inlvl1Scrn = {};
 
 brickpositionLevel1 = 	[[[400,200],[450,200]]];
 
@@ -51,6 +57,11 @@ brickpositionLevel2 = [[[400,200],[450,200],[500,200],[550,200],[400,220],[550,2
 function initSt(){
 	st.x = 0;
 	st.y = 0;
+}
+
+function initInLvlObj1(){
+	inlvl1Scrn.x = 0;
+	inlvl1Scrn.y = 0;
 }
 
 function ballRotation(){
@@ -561,6 +572,7 @@ function drawScore(){
 
 function init(){
 	initCanvas();
+	initInLvlObj1();
 	initLife();
 	ballInit();
 	initStar();
@@ -597,6 +609,10 @@ function startRender(){
 	CONTEXT.drawImage(start,st.x,st.y);
 }
 
+function interLevelScreenRender(){
+	CONTEXT.drawImage(interLevel1Screen,inlvl1Scrn.x,inlvl1Scrn.y);
+}
+
 function cursorRender(){
 	CONTEXT.drawImage(star,crsr.x,crsr.y);
 }
@@ -620,8 +636,17 @@ function winLevel(tab,level){
 
 function passLevel(tab,level){
 	if(winLevel(tab,level)){
-		counterLevel ++;
 		launcher = 1;
+		swtchInLvl = true;
+	}
+}
+
+function interLevelManager() {
+	if(inlvl1Scrn.y > -500){
+		inlvl1Scrn.y -= 1;
+	}
+	if(inlvl1Scrn.y <= -500){
+		setTimeout(function(){counterLevel++; swtchInLvl = false;},3000);
 	}
 }
 
@@ -632,20 +657,25 @@ function fullRender(){
 		cursorRender();
 	}
 	if(startEvent){
-		shiprender();
-		ballrender();
-		drawScore();
-		lifeRender();
-		switch(counterLevel){
-			case 1:
-				brickrender(brickpositionLevel1,1);
-				break;
-			case 2:
-				brickrender(brickpositionLevel2,2);
-				break;
-			default:
-				break;
+		if(swtchInLvl){
+			interLevelScreenRender();
 		}
+		if(!swtchInLvl){
+			shiprender();
+			ballrender();
+			drawScore();
+			lifeRender();
+			switch(counterLevel){
+				case 1:
+					brickrender(brickpositionLevel1,1);
+					break;
+				case 2:
+					brickrender(brickpositionLevel2,2);
+					break;
+				default:
+					break;
+			}
+		}	
 	}
 }
 
@@ -658,17 +688,22 @@ function game(){
 		gainPoint();
 		looseLife();
 		mainMusic();
-		if(counterLevel === 1){
-			packOfCollisionEffect(brickpositionLevel1,1);
-			brickDesign(brickpositionLevel1,1);
-			passLevel(brickpositionLevel1,1);
+		if(swtchInLvl){
+			interLevelManager();
 		}
-		if(counterLevel === 2){
-			if(launcher != 1){
-				packOfCollisionEffect(brickpositionLevel2,2);
+		if(!swtchInLvl){
+			if(counterLevel === 1){
+				packOfCollisionEffect(brickpositionLevel1,1);
+				brickDesign(brickpositionLevel1,1);
+				passLevel(brickpositionLevel1,1);
 			}
-			brickDesign(brickpositionLevel2,2);
-			passLevel(brickpositionLevel2,2);
+			if(counterLevel === 2){
+				if(launcher != 1){
+					packOfCollisionEffect(brickpositionLevel2,2);
+				}
+				brickDesign(brickpositionLevel2,2);
+				passLevel(brickpositionLevel2,2);
+			}
 		}
 	}
 }
