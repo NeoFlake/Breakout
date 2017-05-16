@@ -638,6 +638,7 @@ function passLevel(tab,level){
 	if(winLevel(tab,level)){
 		launcher = 1;
 		swtchInLvl = true;
+		counterLevel++;
 	}
 }
 
@@ -646,7 +647,7 @@ function interLevelManager() {
 		inlvl1Scrn.y -= 1;
 	}
 	if(inlvl1Scrn.y <= -500){
-		setTimeout(function(){counterLevel++; swtchInLvl = false;},3000);
+		setTimeout(function(){swtchInLvl = false;},3000);
 	}
 }
 
