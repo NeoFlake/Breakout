@@ -12,7 +12,7 @@ ballRot = 1;
 beginGame = 0;
 click_x = 0;
 click_y = 0;
-counterLevel = 0;
+counterLevel = 1;
 interlevelOn = false;
 endGameCounter = 0;
 startEvent = false;
@@ -32,7 +32,7 @@ spaceship = new Image();
 ball = new Image();
 start = new Image();
 
-storyLevel1Screen = new Image();
+storyLevel2Screen = new Image();
 level2Screen = new Image();
 
 background.src = "img/background.png";
@@ -40,8 +40,6 @@ star.src = "img/star.png";
 spaceship.src = "img/spaceship2.png";
 start.src = "img/start.png";
 ball.src = "img/ball1.png";
-storyLevel1Screen.src = "img/interlevel.png";
-level2Screen.src = "img/chapter2.png";
 
 let mouseX;
 let mouseY;
@@ -50,8 +48,6 @@ blc = {};
 crsr = {}; 
 ship = {};
 st = {};
-storylvl1Scrn = {};
-lvl2scrn = {};
 
 brickpositionLevel1 = 	[[[400,200],[450,200]]];
 
@@ -59,19 +55,58 @@ brickpositionLevel2 = [[[400,200],[450,200],[500,200],[550,200],[400,220],[550,2
 						[400,240],[550,240],[400,260],[450,260],[500,260],[550,260]],
 						[[450,240]],[[450,220],[500,240]],[[500,220]]];
 
+function createStoryScreen(token){
+	fnName = "storyLevel" + token + "Screen = new Image(); storyLevel" + token + "Screen.src = 'img/storyscreenlvl" + token + ".png';";
+	eval(fnName);
+}
+
+function createLoadingScreen(token){
+	fnName = "level" + token + "Screen = new Image(); level" + token + "Screen.src = 'img/chapter" + token + ".png';";
+	eval(fnName);
+}
+
+function createLoadingObj(token){
+	fnName = "lvl" + token + "scrn = {};";
+	eval(fnName);
+}
+
+function createStoryObj(token){
+	fnName = "storylvl" + token + "scrn = {};";
+	eval(fnName);
+}
+
+function initLoadingObj(token){
+	fnName = "lvl" + token + "scrn.x = 0; lvl" + token + "scrn.y = 0;";
+	eval(fnName);
+}
+
+function initStoryScreenObj(token){
+	fnName = "storylvl" + token + "scrn.x = 0; storylvl" + token + "scrn.y = 0;";
+	eval(fnName);
+}
+
+function createInterLevelScreenManager(token){
+	createStoryScreen(token);
+	createLoadingScreen(token);
+	createLoadingObj(token);
+	createStoryObj(token);
+}
+
+function initInterLevelObjManager(token){
+	initLoadingObj(token);
+	initStoryScreenObj(token);
+}
+
+function initInterLevelManager(){
+	for(let i = 1; i < 3; i++){
+		createInterLevelScreenManager(i);
+		initInterLevelObjManager(i);
+	}
+}
+
 function initSt(){
 	st.x = 0;
 	st.y = 0;
-}
-
-function initInLvlObj1(){
-	storylvl1Scrn.x = 0;
-	storylvl1Scrn.y = 0;
-}
-
-function initLvl2Scrn(){
-	lvl2scrn.x = 0;
-	lvl2scrn.y = 0;
 }
 
 function ballRotation(){
@@ -269,10 +304,10 @@ function keyboardManager(e){
 function gameLauncher() {
 	if(clickStart){
 		startEvent = true;
-		level1 = true;
 		clickStart = false;
 		start.src = "";
-		counterLevel = 1;
+		swtchInLvl = true;
+		swtchStoryScreen = true;
 	}
 }
 
@@ -476,7 +511,7 @@ function mainMusic() {
 	musicLevel.volume = 0.4;
 	}
 	musicTime++;
-	if(musicTime === 10600){
+	if(musicTime === 10500){
 		musicTime = 0;
 		musicLevel.currentTime = 0;
 	}
@@ -586,8 +621,7 @@ function drawScore(){
 
 function init(){
 	initCanvas();
-	initInLvlObj1();
-	initLvl2Scrn();
+	initInterLevelManager();
 	initLife();
 	ballInit();
 	initStar();
@@ -624,20 +658,22 @@ function startRender(){
 	CONTEXT.drawImage(start,st.x,st.y);
 }
 
-function storyLevelScreenRender(){
-	CONTEXT.drawImage(storyLevel1Screen,storylvl1Scrn.x,storylvl1Scrn.y);
+function storyLevelScreenRender(token){
+	fnName = "CONTEXT.drawImage(storyLevel" + token + "Screen,storylvl" + token + "scrn.x,storylvl" + token + "scrn.y);";
+	eval(fnName);
 }
 
-function lvlScreenRender(){
-	CONTEXT.drawImage(level2Screen,lvl2scrn.x,lvl2scrn.y);
+function lvlScreenRender(token){
+	fnName = "CONTEXT.drawImage(level" + token + "Screen,lvl" + token + "scrn.x,lvl"+ token + "scrn.y);";
+	eval(fnName);
 }
 
-function interLevelScreenRender(){
+function interLevelScreenRender(token){
 	if(swtchStoryScreen && !swtchlvlScreen){
-		storyLevelScreenRender();
+		storyLevelScreenRender(token);
 	}
 	else if(swtchlvlScreen && !swtchStoryScreen){
-		lvlScreenRender();
+		lvlScreenRender(token);
 	}
 }
 
@@ -671,15 +707,15 @@ function passLevel(tab,level){
 	}
 }
 
-function storyManager() {
+function storyManager(token) {
 	if(swtchStoryScreen){
-		if(storylvl1Scrn.y === 0){
-		setTimeout(function(){if(storylvl1Scrn.y === 0){storylvl1Scrn.y -=1;}},3000);
+		if(eval("storylvl" + token + "scrn.y === 0")){
+		setTimeout(function(){if(eval("storylvl" + token + "scrn.y === 0")){eval("storylvl" + token + "scrn.y -=1;")}},3000);
 		}
-		else if(storylvl1Scrn.y < 0 && storylvl1Scrn.y > -500){
-			storylvl1Scrn.y -= .5;
+		else if(eval("storylvl" + token + "scrn.y < 0") && eval("storylvl" + token + "scrn.y > -500")){
+			eval("storylvl" + token + "scrn.y -= .5");
 		}
-		else if(storylvl1Scrn.y <= -500){
+		else if(eval("storylvl" + token + "scrn.y <= -500")){
 			setTimeout(function(){swtchStoryScreen = false; swtchlvlScreen = true;},3000);
 		}
 	}	
@@ -691,8 +727,8 @@ function lvlScreenManager(){
 	}
 }
 
-function interLevelManager(){
-	storyManager();
+function interLevelManager(token){
+	storyManager(token);
 	lvlScreenManager();
 }
 
@@ -704,31 +740,14 @@ function fullRender(){
 	}
 	if(startEvent){
 		if(swtchInLvl){
-			switch(counterLevel){
-				case 1:
-					break;
-				case 2:
-					interLevelScreenRender();
-					break;
-				default:
-					break;
-			}
+			interLevelScreenRender(counterLevel);
 		}
 		if(!swtchInLvl){
 			shiprender();
 			ballrender();
 			drawScore();
 			lifeRender();
-			switch(counterLevel){
-				case 1:
-					brickrender(brickpositionLevel1,1);
-					break;
-				case 2:
-					brickrender(brickpositionLevel2,2);
-					break;
-				default:
-					break;
-			}
+			brickrender(eval("brickpositionLevel" + counterLevel),counterLevel);
 		}	
 	}
 }
@@ -743,33 +762,17 @@ function game(){
 		looseLife();
 		mainMusic();
 		if(swtchInLvl){
-			switch(counterLevel){
-				case 1:
-					break;
-				case 2:
-					interLevelManager();
-					break;
-				default:
-					break;
-			}
+			interLevelManager(counterLevel);
 		}
 		if(!swtchInLvl){
-			switch(counterLevel){
-				case 1:
-					packOfCollisionEffect(brickpositionLevel1,1);
-					brickDesign(brickpositionLevel1,1);
-					passLevel(brickpositionLevel1,1);
-					break;
-				case 2:
-					if(launcher != 1){
-						packOfCollisionEffect(brickpositionLevel2,2);
-					}
-					brickDesign(brickpositionLevel2,2);
-					passLevel(brickpositionLevel2,2);
-					break;
-				default:
-					break;
+			if(counterLevel === 1){
+				packOfCollisionEffect(eval("brickpositionLevel" + counterLevel),counterLevel);
 			}
+			if(counterLevel > 1 && launcher != 1){
+				packOfCollisionEffect(eval("brickpositionLevel" + counterLevel),counterLevel);
+			}
+			brickDesign(eval("brickpositionLevel" + counterLevel),counterLevel);
+			passLevel(eval("brickpositionLevel" + counterLevel),counterLevel);
 		}
 	}
 }
