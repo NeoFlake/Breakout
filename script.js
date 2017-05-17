@@ -14,7 +14,6 @@ click_x = 0;
 click_y = 0;
 counterLevel = 1;
 interlevelOn = false;
-endGameCounter = 0;
 startEvent = false;
 clickStart = false;
 endLevel = false;
@@ -31,6 +30,7 @@ star = new Image();
 spaceship = new Image();
 ball = new Image();
 start = new Image();
+over = new Image();
 
 storyLevel2Screen = new Image();
 level2Screen = new Image();
@@ -40,6 +40,7 @@ star.src = "img/star.png";
 spaceship.src = "img/spaceship2.png";
 start.src = "img/start.png";
 ball.src = "img/ball1.png";
+over.src = "img/gameOver.png";
 
 let mouseX;
 let mouseY;
@@ -48,6 +49,7 @@ blc = {};
 crsr = {}; 
 ship = {};
 st = {};
+gm = {};
 
 brickpositionLevel1 = 	[[[400,200],[450,200]]];
 
@@ -107,6 +109,11 @@ function initInterLevelManager(){
 function initSt(){
 	st.x = 0;
 	st.y = 0;
+}
+
+function initGm(){
+	gm.x = 0;
+	gm.y = 0;
 }
 
 function ballRotation(){
@@ -279,6 +286,9 @@ function getPosition(event){
 
 	if(collisions(st, crsr) && !startEvent){
 		clickStart = true;
+	}
+	if(looseGameCount){
+		initRestartManager();
 	}
 }
 
@@ -612,6 +622,13 @@ function looseLife(){
 	launcherSwitch();
 }
 
+function looseGame(){
+	if(life <= 0){
+		looseGameCount = true;
+		startEvent = false;
+	}
+}
+
 function drawScore(){
 	CONTEXT.fillStyle = "lightblue";
 	CONTEXT.font = "24px Sans-Serif";
@@ -624,11 +641,59 @@ function init(){
 	initInterLevelManager();
 	initLife();
 	ballInit();
+	initGm();
 	initStar();
 	initShip();
 	sauvageInit();
 	initVariousParameters();
 	launcher = 1;
+}
+
+function initRestart(){
+	initCanvas();
+	initInterLevelManager();
+	initLife();
+	ballInit();
+	initGm();
+	initStar();
+	initShip();
+	sauvageInit();
+	initVariousParameters();
+	launcher = 1;
+}
+
+function initRestartSwitcher(){
+	interlevelOn = false;
+	startEvent = false;
+	clickStart = false;
+	endLevel = false;
+	looseGameCount = false;
+	swtchInLvl = false;
+	swtchStoryScreen = false;
+	swtchlvlScreen = false;
+}
+
+function initRestartCounter(){
+	score = 0;
+	timePoint = 0;
+	life = 3;
+	launcher = 0;
+	musicTime = 0;
+	ballRot = 1;
+	beginGame = 0;
+	click_x = 0;
+	click_y = 0;
+	counterLevel = 1;
+}
+
+function initRestartVar(){
+	initRestartSwitcher();
+	initRestartCounter();
+}
+
+function initRestartManager(){
+	initRestart();
+	initRestartVar();
 }
 
 function bckRender(){
@@ -736,7 +801,12 @@ function fullRender(){
 	bckRender();
 	startRender();
 	if(!startEvent){
-		cursorRender();
+		if(!looseGameCount){
+			cursorRender();
+		}
+		else{
+			GmOvRender();
+		}
 	}
 	if(startEvent){
 		if(swtchInLvl){
@@ -761,6 +831,7 @@ function game(){
 		gainPoint();
 		looseLife();
 		mainMusic();
+		looseGame();
 		if(swtchInLvl){
 			interLevelManager(counterLevel);
 		}
