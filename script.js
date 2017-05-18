@@ -42,6 +42,18 @@ start.src = "img/start.png";
 ball.src = "img/ball1.png";
 over.src = "img/gameOver.png";
 
+deadSnd = new Audio("sound/wilhelm.wav");
+deadSnd.volume = .7;
+
+boundSnd = new Audio("sound/rebond.wav");
+boundSnd.volume = .7;
+
+destroySnd = new Audio("sound/break.mp3");
+destroySnd.volume = .8;
+
+musicLevel1 = new Audio("sound/celestial.mp3");
+musicLevel1.volume = .4;
+
 let mouseX;
 let mouseY;
 
@@ -289,6 +301,7 @@ function getPosition(event){
 	}
 	if(looseGameCount){
 		initRestartManager();
+		looseGameCount = false;
 	}
 }
 
@@ -387,12 +400,10 @@ function collisionEffect(brick){
 		brick.pv -= 1;
 		brickDeath(brick);
 		if(brick.pv > 0){
-			snd = new Audio("sound/rebond.wav");
-			snd.play();
+			boundSnd.play();
 		}
 		else{
-			snd = new Audio("sound/break.mp3");
-			snd.play();
+			destroySnd.play();
 		}
 	}
 }
@@ -493,8 +504,7 @@ function rightShipCollision(){
 function shipCollisionManager(){
 	if(collisions(ship,blc)){
 		if(launcher != 1){
-		snd = new Audio("sound/rebond.wav");
-		snd.play();
+		boundSnd.play();
 		}
 		leftShipCollision();
 		middleLeftShipCollision();
@@ -515,15 +525,21 @@ function gainPoint(){
 }
 
 function mainMusic() {
-	musicLevel = new Audio("sound/celestial.mp3");
-	if(musicTime === 0){
-	musicLevel.play();
-	musicLevel.volume = 0.4;
+	if(startEvent && !swtchInLvl && counterLevel === 1|2){
+		if(musicTime === 0){
+		musicLevel1.play();
+		}
+		musicTime++;
+		if((musicTime === 10500)){
+			musicLevel1.pause();
+			musicTime = 0;
+			musicLevel1.currentTime = 0;
+		}
 	}
-	musicTime++;
-	if(musicTime === 10500){
+	else{
+		musicLevel1.pause();
 		musicTime = 0;
-		musicLevel.currentTime = 0;
+		musicLevel1.currentTime = 0;
 	}
 }
 
@@ -540,15 +556,11 @@ function packOfCollisionEffect(tab,level){
 
 function bouncingBall(){
 	if(blc.x < 0 || blc.x > 992){
-		snd = new Audio("sound/rebond.wav");
-		snd.play();
-		snd.volume = 0.7;
+		boundSnd.play();
 		vbX *= -1;
 	}
 	if(blc.y < 0 || blc.y > 492){
-		snd = new Audio("sound/rebond.wav");
-		snd.play();
-		snd.volume = 0.7;
+		boundSnd.play();
 		vbY *= -1;
 	}
 }
@@ -612,9 +624,7 @@ function launcherSwitch(){
 
 function looseLife(){
 	if(blc.y > 490){
-		snd = new Audio("sound/wilhelm.wav");
-		snd.play();
-		snd.volume = 0.7;
+		deadSnd.play();
 		life -= 1;
 		stickTheBallOnTheShip();
 		launcher = 1;
@@ -659,6 +669,7 @@ function initRestart(){
 	initShip();
 	sauvageInit();
 	initVariousParameters();
+	start.src = "img/start.png";
 	launcher = 1;
 }
 
@@ -666,8 +677,8 @@ function initRestartSwitcher(){
 	interlevelOn = false;
 	startEvent = false;
 	clickStart = false;
-	endLevel = false;
 	looseGameCount = false;
+	endLevel = false;
 	swtchInLvl = false;
 	swtchStoryScreen = false;
 	swtchlvlScreen = false;
