@@ -22,6 +22,8 @@ swtchInLvl = false;
 swtchStoryScreen = false;
 swtchlvlScreen = false;
 
+regameCount = false;
+
 vbX = 0;
 vbY = 0;
 
@@ -296,12 +298,14 @@ function getPosition(event){
 	Click_x -= canvas.offsetLeft;
 	Click_y -= canvas.offsetTop;
 
-	if(collisions(st, crsr) && !startEvent){
+	if((collisions(st, crsr) && !startEvent) || (regameCount)){
 		clickStart = true;
+		regameCount = false;
 	}
 	if(looseGameCount){
 		initRestartManager();
 		looseGameCount = false;
+		regameCount = true;
 	}
 }
 
