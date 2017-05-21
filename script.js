@@ -25,7 +25,6 @@ endGame = false;
 endGameStory = false;
 endGameCredits = false;
 endGameFinalScreen = false;
-tryAgainCount = false;
 
 vbX = 0;
 vbY = 0;
@@ -321,19 +320,12 @@ function getPosition(event){
 	Click_x -= canvas.offsetLeft;
 	Click_y -= canvas.offsetTop;
 
-	if(!startEvent || tryAgainCount){
+	if(!startEvent){
 		clickStart = true;
 		tryAgainCount = false;
 	}
-	if(looseGameCount){
-		initRestartManager();
-		looseGameCount = false;
-		tryAgainCount = true;
-	}
-
-	if(startEvent && swtchInLvl && !endGame){
-		swtchInLvl = false;
-		swtchStoryScreen = false;
+	if(looseGameCount || (endGame && endGameFinalScreen)){
+		window.location.reload();
 	}
 }
 
@@ -354,7 +346,7 @@ function keyboardManager(e){
 			ship.x += 10;
 		}
 	}
-	if(endGame && endGameFinalScreen){
+	if((endGame && endGameFinalScreen) || looseGameCount){
 		if(e.keyCode === 13){
 			e.preventDefault();
 			window.location.reload();
@@ -695,45 +687,6 @@ function init(){
 	sauvageInit();
 	initVariousParameters();
 	launcher = 1;
-}
-
-function initRestartSwitcher(){
-	interlevelOn = false;
-	startEvent = false;
-	clickStart = false;
-	endLevel = false;
-	looseGameCount = false;
-	swtchInLvl = false;
-	swtchStoryScreen = false;
-	swtchlvlScreen = false;
-	endGame = false;
-	endGameStory = false;
-	endGameCredits = false;
-	endGameFinalScreen = false;
-	tryAgainCount = false;
-}
-
-function initRestartCounter(){
-	score = 0;
-	timePoint = 0;
-	life = 3;
-	launcher = 0;
-	musicTime = 0;
-	ballRot = 1;
-	beginGame = 0;
-	click_x = 0;
-	click_y = 0;
-	counterLevel = 1;
-}
-
-function initRestartVar(){
-	initRestartSwitcher();
-	initRestartCounter();
-}
-
-function initRestartManager(){
-	initRestartVar();
-	init();
 }
 
 function bckRender(){
