@@ -21,8 +21,7 @@ looseGameCount = false;
 swtchInLvl = false;
 swtchStoryScreen = false;
 swtchlvlScreen = false;
-
-regameCount = false;
+tryAgainCount = false;
 
 vbX = 0;
 vbY = 0;
@@ -298,14 +297,14 @@ function getPosition(event){
 	Click_x -= canvas.offsetLeft;
 	Click_y -= canvas.offsetTop;
 
-	if((collisions(st, crsr) && !startEvent) || (regameCount)){
+	if(!startEvent || tryAgainCount){
 		clickStart = true;
-		regameCount = false;
+		tryAgainCount = false;
 	}
 	if(looseGameCount){
 		initRestartManager();
 		looseGameCount = false;
-		regameCount = true;
+		tryAgainCount = true;
 	}
 }
 
@@ -332,7 +331,6 @@ function gameLauncher() {
 	if(clickStart){
 		startEvent = true;
 		clickStart = false;
-		start.src = "";
 		swtchInLvl = true;
 		swtchStoryScreen = true;
 	}
@@ -814,9 +812,9 @@ function interLevelManager(token){
 
 function fullRender(){
 	bckRender();
-	startRender();
 	if(!startEvent){
 		if(!looseGameCount){
+			startRender();
 			cursorRender();
 		}
 		else{
