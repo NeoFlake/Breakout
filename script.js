@@ -21,6 +21,10 @@ looseGameCount = false;
 swtchInLvl = false;
 swtchStoryScreen = false;
 swtchlvlScreen = false;
+endGame = false;
+endGameStory = false;
+endGameCredits = false;
+endGameFinalScreen = false;
 tryAgainCount = false;
 
 vbX = 0;
@@ -33,8 +37,9 @@ ball = new Image();
 start = new Image();
 over = new Image();
 
-storyLevel2Screen = new Image();
-level2Screen = new Image();
+finalStory = new Image();
+credits = new Image();
+finalScreen = new Image();
 
 background.src = "img/background.png";
 star.src = "img/star.png";
@@ -42,6 +47,10 @@ spaceship.src = "img/spaceship2.png";
 start.src = "img/start.png";
 ball.src = "img/ball1.png";
 over.src = "img/gameOver.png";
+
+finalStory.src = "img/endStory.png";
+credits.src = "img/credits.png";
+finalScreen.src = "img/finalScreen.png";
 
 deadSnd = new Audio("sound/wilhelm.wav");
 deadSnd.volume = .7;
@@ -64,11 +73,17 @@ ship = {};
 st = {};
 gm = {};
 
+fnlstr = {};
+crdt = {};
+fnlscrn = {};
+
 brickpositionLevel1 = 	[[[400,200],[450,200]]];
 
-brickpositionLevel2 = [[[400,200],[450,200],[500,200],[550,200],[400,220],[550,220],
-						[400,240],[550,240],[400,260],[450,260],[500,260],[550,260]],
-						[[450,240]],[[450,220],[500,240]],[[500,220]]];
+brickpositionLevel2 = [[[400,200],[450,200]]];
+
+// [[[400,200],[450,200],[500,200],[550,200],[400,220],[550,220],
+// [400,240],[550,240],[400,260],[450,260],[500,260],[550,260]],
+// [[450,240]],[[450,220],[500,240]],[[500,220]]];
 
 function createStoryScreen(token){
 	fnName = "storyLevel" + token + "Screen = new Image(); storyLevel" + token + "Screen.src = 'img/storyscreenlvl" + token + ".png';";
@@ -127,6 +142,15 @@ function initSt(){
 function initGm(){
 	gm.x = 0;
 	gm.y = 0;
+}
+
+function initFinalScreens(){
+	fnlstr.x = 0;
+	fnlstr.y = 0;
+	crdt.x = 0;
+	crdt.y = 0;
+	fnlscrn.x = 0;
+	fnlscrn.y = 0;
 }
 
 function ballRotation(){
@@ -306,6 +330,11 @@ function getPosition(event){
 		looseGameCount = false;
 		tryAgainCount = true;
 	}
+
+	if(startEvent && swtchInLvl && !endGame){
+		swtchInLvl = false;
+		swtchStoryScreen = false;
+	}
 }
 
 function keyboardManager(e){
@@ -323,6 +352,12 @@ function keyboardManager(e){
 		if(e.keyCode === 39){
 			e.preventDefault();
 			ship.x += 10;
+		}
+	}
+	if(endGame && endGameFinalScreen){
+		if(e.keyCode === 13){
+			e.preventDefault();
+			window.location.reload();
 		}
 	}
 }
@@ -651,6 +686,7 @@ function drawScore(){
 function init(){
 	initCanvas();
 	initInterLevelManager();
+	initFinalScreens();
 	initLife();
 	ballInit();
 	initGm();
@@ -658,20 +694,6 @@ function init(){
 	initShip();
 	sauvageInit();
 	initVariousParameters();
-	launcher = 1;
-}
-
-function initRestart(){
-	initCanvas();
-	initInterLevelManager();
-	initLife();
-	ballInit();
-	initGm();
-	initStar();
-	initShip();
-	sauvageInit();
-	initVariousParameters();
-	start.src = "img/start.png";
 	launcher = 1;
 }
 
@@ -679,11 +701,16 @@ function initRestartSwitcher(){
 	interlevelOn = false;
 	startEvent = false;
 	clickStart = false;
-	looseGameCount = false;
 	endLevel = false;
+	looseGameCount = false;
 	swtchInLvl = false;
 	swtchStoryScreen = false;
 	swtchlvlScreen = false;
+	endGame = false;
+	endGameStory = false;
+	endGameCredits = false;
+	endGameFinalScreen = false;
+	tryAgainCount = false;
 }
 
 function initRestartCounter(){
@@ -705,8 +732,8 @@ function initRestartVar(){
 }
 
 function initRestartManager(){
-	initRestart();
 	initRestartVar();
+	init();
 }
 
 function bckRender(){
@@ -763,6 +790,30 @@ function GmOvRender(){
 	CONTEXT.drawImage(over,gm.x,gm.y);
 }
 
+function finalStoryRender(){
+	CONTEXT.drawImage(finalStory,fnlstr.x,fnlstr.y);
+}
+
+function creditsRender(){
+	CONTEXT.drawImage(credits,crdt.x,crdt.y);
+}
+
+function finalScreenRender(){
+	CONTEXT.drawImage(finalScreen,fnlscrn.x,fnlscrn.y);
+}
+
+function endingScreenRenderManager(){
+	if(endGameStory && (!endGameCredits && !endGameFinalScreen)){
+		finalStoryRender();
+	}
+	else if (endGameCredits && (!endGameStory && !endGameFinalScreen)){
+		creditsRender();
+	}
+	else if(endGameFinalScreen && (!endGameStory && !endGameCredits)){
+		finalScreenRender();
+	}
+}
+
 function winLevel(tab,level){
 	bricksCleared = true;
 	memoryLength = 0;
@@ -782,6 +833,10 @@ function passLevel(tab,level){
 		swtchInLvl = true;
 		swtchStoryScreen = true;
 		counterLevel++;
+		if(counterLevel === 3){
+			endGame = true;
+			endGameStory = true;
+		}
 	}
 }
 
@@ -810,6 +865,46 @@ function interLevelManager(token){
 	lvlScreenManager();
 }
 
+function endStory(){
+	if(endGameStory){
+		if(fnlstr.y === 0){
+			setTimeout(function(){if(fnlstr.y === 0){fnlstr.y -= 1;}}, 3000);
+		}
+		else if(fnlstr.y > -500){
+			fnlstr.y -= .5;
+		}
+		else if(fnlstr.y <= -500){
+			setTimeout(function(){endGameStory = false; endGameCredits = true}, 3000);
+		}
+	}
+}
+
+function endCredits(){
+	if(endGameCredits){
+		if(crdt.y === 0){
+			setTimeout(function(){if(crdt.y === 0){crdt.y -= 1;}}, 3000);
+		}
+		else if (crdt.y > -500){
+			crdt.y -= .5;
+		}
+		else if(crdt.y <= -500){
+			setTimeout(function(){endGameCredits = false; endGameFinalScreen = true}, 3000);
+		}
+	}
+}
+
+function finalEndScreen(){
+	if(endGameFinalScreen){
+		setTimeout(function(){window.location.reload();}, 10000);
+	}
+}
+
+function endGameManager(){
+	endStory();
+	endCredits();
+	finalEndScreen();
+}
+
 function fullRender(){
 	bckRender();
 	if(!startEvent){
@@ -823,7 +918,12 @@ function fullRender(){
 	}
 	if(startEvent){
 		if(swtchInLvl){
-			interLevelScreenRender(counterLevel);
+			if(!endGame){
+				interLevelScreenRender(counterLevel);
+			}
+			if(endGame){
+				endingScreenRenderManager();
+			}
 		}
 		if(!swtchInLvl){
 			shiprender();
@@ -846,7 +946,12 @@ function game(){
 		mainMusic();
 		looseGame();
 		if(swtchInLvl){
-			interLevelManager(counterLevel);
+			if(!endGame){
+				interLevelManager(counterLevel);
+			}
+			if(endGame){
+				endGameManager();
+			}
 		}
 		if(!swtchInLvl){
 			if(counterLevel === 1){
