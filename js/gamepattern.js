@@ -74,7 +74,7 @@ let endCredits = () => {
 
 let finalEndScreen = () => {
 	endGameFinalScreen ? (
-		setTimeout(function(){window.location.reload();}, 10000)
+		setTimeout(function(){window.location.reload();}, 100000)
 	) : false;
 }
 
@@ -107,14 +107,15 @@ let game = () => {
 		shipCollisionManager();
 		gainPoint();
 		looseLife();
-		mainMusic();
 		looseGame();
 		if(swtchInLvl){
 			if(!endGame){
 				interLevelManager(counterLevel);
+				interLevelMusicManager();
 			}
 			if(endGame){
 				endGameManager();
+				endGameMusicManager();
 			}
 		}
 		if(!swtchInLvl){
@@ -125,7 +126,12 @@ let game = () => {
 				packOfCollisionEffect(translateFunction("brickpositionLevel" + counterLevel),counterLevel);
 			}
 			brickDesign(translateFunction("brickpositionLevel" + counterLevel),counterLevel);
+			levelMusic(counterLevel);
+			winLevelMusicLauncher(translateFunction("brickpositionLevel" + counterLevel),counterLevel);
 			passLevel(translateFunction("brickpositionLevel" + counterLevel),counterLevel);
 		}
+	}
+	if(!startEvent){
+		gameOverMusicManager(counterLevel);
 	}
 }

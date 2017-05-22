@@ -308,35 +308,95 @@ let winLevel = (tab,level) => {
 // soit de la fin du jeu
 
 let passLevel = (tab,level) => {
-	if(winLevel(tab,level)){
+	if(winLevel(tab,level) && !launchReady){
 		launcher = 1;
-		swtchInLvl = true;
-		swtchStoryScreen = true;
-		counterLevel++;
-		if(counterLevel === 4){
-			endGame = true;
-			endGameStory = true;
-		}
+		launchReady = true;
+		setTimeout(function(){
+			launcher = 1;
+			swtchInLvl = true;
+			swtchStoryScreen = true;
+			counterLevel++;
+			launchReady = false;
+			if(counterLevel === 4){
+				endGame = true;
+				endGameStory = true;
+		}}, 4300);
+		
 	}
 }
 
-// Gestionnaire de la musique principale du niveau ( à changer ce soir )
+// Gestionnaire de la musique principale du niveau
 
-let mainMusic = () => {
-	if(startEvent && !swtchInLvl && counterLevel === 1|2){
-		if(musicTime === 0){
-		musicLevel1.play();
-		}
-		musicTime++;
-		if((musicTime === 10500)){
-			musicLevel1.pause();
-			musicTime = 0;
-			musicLevel1.currentTime = 0;
-		}
+let levelMusic = token => {
+	if(translateFunction("musicLevel" + token + ".currentTime === 0")){
+		translateFunction("musicLevel" + token + ".play();");
 	}
-	else{
-		musicLevel1.pause();
-		musicTime = 0;
-		musicLevel1.currentTime = 0;
+	if(translateFunction("musicLevel" + token + ".currentTime === musicLevel" + token + ".duration;")){
+		translateFunction("musicLevel" + token + ".pause();");
+		translateFunction("musicLevel" + token + ".currentTime = 0;");
 	}
+}
+
+// Gestionnaire de la musique lors de la victoire d'un niveau
+
+let winLevelMusicLauncher = (tab,level) => {
+	if(winLevel(tab,level)){
+		translateFunction("musicLevel" + level + ".pause();");
+		translateFunction("musicLevel" + level + ".currenTime = 0;");
+		winLevelMusic.play();
+	}
+}
+
+// Gestionnaire des musiques inter-niveaux
+
+let storyLevelMusic = () => {
+	swtchStoryScreen ? (
+ 		winLevelMusic.pause(),
+		winLevelMusic.currentTime = 0,
+		storyMusic.play()
+	) : false;
+}
+
+let chapterMusic = () => {
+	swtchlvlScreen ? (
+		storyMusic.pause(),
+		storyMusic.currentTime = 0
+	) : false;
+}
+
+let interLevelMusicManager = () => {
+	storyLevelMusic();
+	chapterMusic();
+}
+
+// Gestionnaire des musiques de la fin du jeu
+
+let endStoryLevelMusic = () => {
+	endGameStory ? (
+		winLevelMusic.pause(),
+		winLevelMusic.currentTime = 0,
+		storyMusic.play()
+	) : false;
+}
+
+let creditsMusic = () => {
+	endGameCredits ? (
+		storyMusic.pause(),
+		storyMusic.currentTime = 0,
+		endGameMusic.play()
+	) : false;
+}
+
+let endGameMusicManager = () => {
+	endStoryLevelMusic();
+	creditsMusic();
+}
+
+// Gestionnaire de la musique de Game Over
+
+let gameOverMusicManager = token => {
+	looseGameCount ? (
+		translateFunction("musicLevel" + token + ".pause();"),
+		gameOverMusic.play()
+	) : false;
 }

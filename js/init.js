@@ -185,6 +185,7 @@ let init = () => {
 	initInterLevelManager();
 	initFinalScreens();
 	initLife();
+	initMusicLevel();
 	ballInit();
 	initGm();
 	initStar();
