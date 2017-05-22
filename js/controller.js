@@ -313,7 +313,7 @@ let passLevel = (tab,level) => {
 		swtchInLvl = true;
 		swtchStoryScreen = true;
 		counterLevel++;
-		if(counterLevel === 3){
+		if(counterLevel === 4){
 			endGame = true;
 			endGameStory = true;
 		}

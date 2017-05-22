@@ -95,7 +95,7 @@ let initBrick = (tab,level) => {
 // Manager permettant d'exécuter l'ensemble de la génération de briques plus rapidement
 
 let sauvageInit = () => {
-	for(let i = 1; i < 3; i++){
+	for(let i = 1; i < 4; i++){
 		packOfSpriteDimension(eval("brickpositionLevel" + i),i);
 		initBrick(eval("brickpositionLevel" + i),i);
 	}
@@ -163,7 +163,7 @@ let initInterLevelObjManager = token => {
 // Manager global permettant la génération des écrans d'entre-niveaux
 
 let initInterLevelManager = () => {
-	for(let i = 1; i < 3; i++){
+	for(let i = 1; i < 4; i++){
 		createInterLevelScreenManager(i);
 		initInterLevelObjManager(i);
 	}
