@@ -25,14 +25,14 @@ let ballTravel = () => {
 // Permet à la balle de rebondir contre les murs
 
 let bouncingBall = () => {
-	if(blc.x < 0 || blc.x > 992){
-		boundSnd.play();
-		vbX *= -1;
-	}
-	if(blc.y < 0 || blc.y > 492){
-		boundSnd.play();
-		vbY *= -1;
-	}
+	((blc.x < 0 || blc.x > 992) && !swtchInLvl) ? (
+		boundSnd.play(),
+		vbX *= -1
+	) : false;
+	(blc.y < 0 || blc.y > 492) ? (
+		boundSnd.play(),
+		vbY *= -1
+	) : false;
 }
 
 // Permet de réinitialiser la balle contre le paddle de jeu
@@ -61,27 +61,26 @@ let ballLauncher = () => {
 // Défini le vecteur initial de la balle de manière aléatoire
 
 let initialVector = () => {
-	if(((ship.x + (ship.w/2)) >= 0) && ((ship.x + (ship.w/2)) <= 200)){
-		vbX = Math.round(Math.random() * -2) - 4;
-		vbY = Math.round(Math.random() * -2) - 2;
-		console.log("Coucou 1");
-	}
-	if(((ship.x + (ship.w/2)) > 200) && ((ship.x + (ship.w/2)) <= 400)){
-		vbX = Math.round(Math.random() * -2) - 2;
-		vbY = Math.round(Math.random() * -2) - 4;
-	}
- 	if(((ship.x + (ship.w/2)) > 400) && ((ship.x + (ship.w/2)) <= 600)){
- 		vbX = Math.round(Math.random() * (Math.random() * -1));
-		vbY = Math.round(Math.random()) + 5;
- 	}
- 	if(((ship.x + (ship.w/2)) > 600) && ((ship.x + (ship.w/2)) <= 800)){
- 		vbX = Math.round(Math.random() * 2) + 2;
-		vbY = Math.round(Math.random() * -2) - 4;
- 	}
- 	if(((ship.x + (ship.w/2)) >= 800) && ((ship.x + (ship.w/2)) <= 1000)){
- 		vbX = Math.round(Math.random() * 2) + 4;
-		vbY = Math.round(Math.random() * -2) - 2;
- 	}
+	(((ship.x + (ship.w/2)) >= 0) && ((ship.x + (ship.w/2)) <= 200)) ? (
+		vbX = Math.round(Math.random() * -2) - 4,
+		vbY = Math.round(Math.random() * -2) - 2
+	) : false;
+	(((ship.x + (ship.w/2)) > 200) && ((ship.x + (ship.w/2)) <= 400)) ? (
+		vbX = Math.round(Math.random() * -2) - 2,
+		vbY = Math.round(Math.random() * -2) - 4
+	) : false;
+ 	(((ship.x + (ship.w/2)) > 400) && ((ship.x + (ship.w/2)) <= 600)) ? (
+ 		vbX = Math.round(Math.random() * (Math.random() * -1)),
+		vbY = Math.round(Math.random()) + 5
+ 	) : false;
+ 	(((ship.x + (ship.w/2)) > 600) && ((ship.x + (ship.w/2)) <= 800)) ? (
+ 		vbX = Math.round(Math.random() * 2) + 2,
+		vbY = Math.round(Math.random() * -2) - 4
+ 	) : false;
+ 	(((ship.x + (ship.w/2)) >= 800) && ((ship.x + (ship.w/2)) <= 1000)) ? (
+ 		vbX = Math.round(Math.random() * 2) + 4,
+		vbY = Math.round(Math.random() * -2) - 2
+ 	) : false;
 	launcher = 0;
 }
 
@@ -416,6 +415,10 @@ let endGameMusicManager = () => {
 let gameOverMusicManager = token => {
 	looseGameCount ? (
 		translateFunction("musicLevel" + token + ".pause();"),
-		gameOverMusic.play()
+		gameOverMusic.play(),
+		(gameOverMusic.currentTime === gameOverMusic.duration) ? (
+			gameOverMusic.currentTime = 0,
+			gameOverMusic.play()
+		) : false
 	) : false;
 }
