@@ -61,8 +61,27 @@ let ballLauncher = () => {
 // Défini le vecteur initial de la balle de manière aléatoire
 
 let initialVector = () => {
-	vbX = Math.round(Math.random() * 4) + 2;
-	vbY = (Math.round(Math.random() * 4) + 2) * -1;
+	if(((ship.x + (ship.w/2)) >= 0) && ((ship.x + (ship.w/2)) <= 200)){
+		vbX = Math.round(Math.random() * -2) - 4;
+		vbY = Math.round(Math.random() * -2) - 2;
+		console.log("Coucou 1");
+	}
+	if(((ship.x + (ship.w/2)) > 200) && ((ship.x + (ship.w/2)) <= 400)){
+		vbX = Math.round(Math.random() * -2) - 2;
+		vbY = Math.round(Math.random() * -2) - 4;
+	}
+ 	if(((ship.x + (ship.w/2)) > 400) && ((ship.x + (ship.w/2)) <= 600)){
+ 		vbX = Math.round(Math.random() * (Math.random() * -1));
+		vbY = Math.round(Math.random()) + 5;
+ 	}
+ 	if(((ship.x + (ship.w/2)) > 600) && ((ship.x + (ship.w/2)) <= 800)){
+ 		vbX = Math.round(Math.random() * 2) + 2;
+		vbY = Math.round(Math.random() * -2) - 4;
+ 	}
+ 	if(((ship.x + (ship.w/2)) >= 800) && ((ship.x + (ship.w/2)) <= 1000)){
+ 		vbX = Math.round(Math.random() * 2) + 4;
+		vbY = Math.round(Math.random() * -2) - 2;
+ 	}
 	launcher = 0;
 }
 
