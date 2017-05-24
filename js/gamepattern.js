@@ -54,7 +54,7 @@ let interLevelManager = token => {
 let endStory = () => {
 	if(endGameStory){
 		if(fnlstr.y === 0){
-			setTimeout(function(){if(fnlstr.y === 0){fnlstr.y -= 1;}}, 3000);
+			setTimeout(function(){fnlstr.y === 0 ? fnlstr.y -= 1 : false;}, 3000);
 		}
 		else if(fnlstr.y > -500){
 			fnlstr.y -= .5;

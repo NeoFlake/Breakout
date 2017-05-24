@@ -137,17 +137,27 @@ let keyboardManager = e => {
 			clickStart = true;
 		}
 	}
-	if(startEvent && !swtchInLvl){
-		if(e.keyCode === 37){
-			ship.x -= 10;
-		}
-		if(e.keyCode === 39){
-			ship.x += 10;
-		}
-	}
 	if((endGame && endGameFinalScreen) || looseGameCount){
 		if(e.keyCode === 13){
 			window.location.reload();
+		}
+	}
+	if(startEvent && !swtchInLvl){
+		if(e.keyCode === 37){
+			if(ship.x >= -20){
+				ship.x -= 30;
+			}
+			else{
+				ship.x = 930;
+			}
+		}
+		if(e.keyCode === 39){
+			if(ship.x <= 930){
+				ship.x += 30;
+			}
+			else{
+				ship.x = -50;
+			}
 		}
 	}
 	(e.keyCode === 13 || e.keyCode === 37 || e.keyCode === 39) ? e.preventDefault() : false;
