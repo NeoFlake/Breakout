@@ -10,24 +10,35 @@
  // Manager du déroulement de l'écran d'histoire du jeu                                                                                
 
 let storyManager = token => {
-	if(swtchStoryScreen){
-		if(translateFunction("storylvl" + token + "scrn.y === 0")){
-		setTimeout(function(){if(translateFunction("storylvl" + token + "scrn.y === 0")){translateFunction("storylvl" + token + "scrn.y -=1;")}},3000);
-		}
-		else if(translateFunction("storylvl" + token + "scrn.y < 0") && translateFunction("storylvl" + token + "scrn.y > -500")){
-			translateFunction("storylvl" + token + "scrn.y -= .5");
-		}
-		else if(translateFunction("storylvl" + token + "scrn.y <= -500")){
-			setTimeout(function(){swtchStoryScreen = false; swtchlvlScreen = true;},3000);
-		}
-	}	
+	swtchStoryScreen ? (
+		counterLevel != 1 ? CANVAS.addEventListener("click",function(){screenAccelerator = true;}) : false,
+		translateFunction("storylvl" + token + "scrn.y === 0") ? setTimeout(function(){if(translateFunction("storylvl" + token + "scrn.y === 0")){translateFunction("storylvl" + token + "scrn.y -=1;")}},3000) : false,
+		screenAccelerator ? (
+			(translateFunction("storylvl" + token + "scrn.y < 0") && translateFunction("storylvl" + token + "scrn.y > -500")) ? (
+				translateFunction("storylvl" + token + "scrn.y -= 100")
+			) : false,
+			translateFunction("storylvl" + token + "scrn.y <= -500") ? (
+				setTimeout(function(){swtchStoryScreen = false; swtchlvlScreen = true;screenAccelerator = false;},1000)
+			) : false
+		) : (
+			(translateFunction("storylvl" + token + "scrn.y < 0") && translateFunction("storylvl" + token + "scrn.y > -500")) ? (
+				translateFunction("storylvl" + token + "scrn.y -= .5"),
+				CANVAS.addEventListener("click",function(){screenAccelerator = true;})
+			) : false,
+			translateFunction("storylvl" + token + "scrn.y <= -500") ? (
+				setTimeout(function(){swtchStoryScreen = false; swtchlvlScreen = true;screenAccelerator = false;},7000)
+			) : false
+		)
+	) : false;	
 }
 
 // Fonction permettant de différer le lancement du prochain niveau en laissant l'écran Titre du niveau pendant cinq seconde
 
 let lvlScreenManager = () => {
 	swtchlvlScreen ? (
-		setTimeout(function(){swtchlvlScreen = false; swtchInLvl = false;},5000)
+		screenAccelerator ? 
+			setTimeout(function(){swtchlvlScreen = false; swtchInLvl = false; screenAccelerator = false;},5000) : 
+			setTimeout(function(){swtchlvlScreen = false; swtchInLvl = false; screenAccelerator = false;},1000)
 	) : false;
 }
 

@@ -25,12 +25,10 @@ let ballTravel = () => {
 // Permet à la balle de rebondir contre les murs
 
 let bouncingBall = () => {
-	((blc.x < 0 || blc.x > 992) && !swtchInLvl) ? (
-		boundSnd.play(),
+	(blc.x < 0 || blc.x > 992) ? (
 		vbX *= -1
 	) : false;
 	(blc.y < 0 || blc.y > 492) ? (
-		boundSnd.play(),
 		vbY *= -1
 	) : false;
 }
@@ -47,7 +45,7 @@ let stickTheBallOnTheShip = () => {
 // Écouteur d'évènement permetttant de lancer la balle
 
 let ballLauncher = () => {
-	CANVAS.addEventListener("click", function(){if (startEvent && !swtchInLvl){launcher = 2;}});
+	CANVAS.addEventListener("click", function(){(startEvent && !swtchInLvl) ? launcher = 2 : false;});
 	window.addEventListener("keypress", function(e){
 		if(startEvent && !swtchInLvl){
 			if(e.keyCode === 32){

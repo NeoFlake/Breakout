@@ -47,6 +47,7 @@ endGameStory = false;
 endGameCredits = false;
 endGameFinalScreen = false;
 launchReady = false;
+screenAccelerator = false;
 City = false;
 
 // Initialisation du positionnement souris
