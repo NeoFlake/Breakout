@@ -48,6 +48,7 @@ endGameCredits = false;
 endGameFinalScreen = false;
 launchReady = false;
 screenAccelerator = false;
+inCollision = false;
 City = false;
 
 // Initialisation du positionnement souris

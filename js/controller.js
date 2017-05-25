@@ -26,6 +26,8 @@ let ballTravel = () => {
 
 let bouncingBall = () => {
 	(blc.x < 0 || blc.x > 992) ? (
+		(!vbX && blc.x < 0) ? vbX = 2 : false,
+		(!vbX && blc.x > 992) ? vbX = -2 : false,
 		vbX *= -1
 	) : false;
 	(blc.y < 0 || blc.y > 492) ? (
@@ -119,45 +121,79 @@ let gainPoint = () => {
 	}
 }
 
-// Gain de point de vie à la mort d'une brique
-
-let brickDeath = brick => {
-	brick.pv <= 0 ? (
-		score += 1000
-	) : false;
-}
-
 // Manager de collision permettant de différencier les types de rebond en fonction de l'endroit de la collision
 // entre la balle et une brique
 
 let collisionEffect = brick => {	
-	if(collisions(brick,blc)){
+	if(collisions(brick,blc) && !inCollision){
 		score += 100;
-		if(blc.y <= brick.y + (brick.h/2)){
-			blc.y = blc.y - 13;
-			vbY *= -1;
-		}
-		else {
-			if(blc.y >= brick.y - (brick.h/2)){
-				blc.y = blc.y + 13;
-				vbY *= -1;
+		// let blcTop = blc.y + Math.trunc(blc.w/2);
+		// let blcBot = blc.y + blc.h + Math.trunc(blc.w/2);
+		// let blcLeft = blc.x + Math.trunc(blc.h/2);
+		// let blcRight = blc.x + blc.w + Math.trunc(blc.h/2);
+		// if(blcRight >= brick.x){
+		// 	blc.x = brick.x - 13;
+		//  	vbX *= -1;
+		// }
+		// if(blcLeft <= (brick.x + brick.x)){
+		// 	blc.x = brick.x + brick.w;
+		//     vbX *= -1;
+		// }
+		// if(blcTop <= brick.y + (brick.h/2)){
+		// 	blc.y = blc.y - 13;
+		//  	vbY *= -1;
+		// }
+		// if(blcBot >= brick.y - (brick.h/2)){
+		// 	blc.y = blc.y + 13;
+		// 	vbY *= -1;
+		// }
+
+		
+		if((blc.x + blc.w) > brick.x){
+			if((blc.y <= brick.y + (brick.h/2)) || (blc.y >= brick.y - (brick.h/2))){
+				blc.x += (vbX *= -1);
 			}
-			else {
-				if(blc.x < (brick.x + brick.w)){
-				  blc.x = blc.x - blc.w - 13;
-				  vbX *= -1;
-				}
-				else{
-					if((blc.x + blc.w) > brick.x){
-					  blc.x = blc.x + 13;
-					  vbX *= -1;
-					}
-				}
-			}		
+			else{
+				blc.x = brick.x - 13;
+				vbX *= -1;
+			}
+		}
+		if(blc.x < (brick.x + brick.w)){
+			if((blc.y <= brick.y + (brick.h/2)) || (blc.y >= brick.y - (brick.h/2))){
+		 		blc.x += (vbX *= -1);
+			}
+			else{
+				blc.x = brick.x + brick.w;
+		 		vbX *= -1;
+			}
+		}
+		if(blc.y <= brick.y + (brick.h/2)){
+			if(((blc.x + blc.w) > brick.x) || (blc.x < (brick.x + brick.w))){
+				blc.y += (vbY *= -1);
+			}
+			else{
+				blc.y = blc.y - 13;
+				vbY *= -1;
+			}	
+		}
+		if(blc.y >= brick.y - (brick.h/2)){
+			if(((blc.x + blc.w) > brick.x) || (blc.x < (brick.x + brick.w))){
+				blc.y += (vbY *= -1);
+			}
+			else{
+				blc.y = blc.y + 13;
+				vbY *= -1;	
+			}
 		}
 		brick.pv -= 1;
-		brickDeath(brick);
-		brick.pv > 0 ? boundSnd.play() : destroySnd.play();
+		brick.pv > 0 ? boundSnd.play() : ( 
+			destroySnd.play(),
+			score += 1000
+		);
+		inCollision = true;
+	}
+	else if(!collisions(brick,blc)){
+		inCollision = false;
 	}
 }
 
