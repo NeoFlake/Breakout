@@ -132,34 +132,18 @@ let getPosition = event => {
 // Manager permettant de gérer l'utilisation du clavier à la place de la souris
 
 let keyboardManager = e => {
-	if(!startEvent){
-		if(e.keyCode === 13){
-			clickStart = true;
-		}
-	}
-	if((endGame && endGameFinalScreen) || looseGameCount){
-		if(e.keyCode === 13){
-			window.location.reload();
-		}
-	}
-	if(startEvent && !swtchInLvl){
-		if(e.keyCode === 37){
-			if(ship.x >= -20){
-				ship.x -= 30;
-			}
-			else{
-				ship.x = 930;
-			}
-		}
-		if(e.keyCode === 39){
-			if(ship.x <= 930){
-				ship.x += 30;
-			}
-			else{
-				ship.x = -50;
-			}
-		}
-	}
+	e.keyCode === 13 ? (
+		!startEvent ? clickStart = true : false,
+		((endGame && endGameFinalScreen) || looseGameCount) ? window.location.reload() : false
+	) : false;
+	(startEvent && !swtchInLvl) ? (
+		e.keyCode === 37 ? (
+			ship.x >= -20 ? ship.x -= 30 : ship.x = 930
+		) : false,
+		e.keyCode === 39 ? (
+			ship.x <= 930 ? ship.x += 30 : ship.x = -50
+		) : false
+	) : false;
 	(e.keyCode === 13 || e.keyCode === 37 || e.keyCode === 39) ? e.preventDefault() : false;
 }
 
@@ -182,7 +166,7 @@ let initInterLevelManager = () => {
 // Initialisation des écouteurs d'évènements
 
 let initEventListener = () => {
-	CANVAS.addEventListener("mousemove", souris, false);
+	window.addEventListener("mousemove", souris, false);
 	CANVAS.addEventListener("mousedown", getPosition, false);
 	window.addEventListener("keydown", keyboardManager, false);
 	document.getElementById("canvas").style.cursor = 'none';

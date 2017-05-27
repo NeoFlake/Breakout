@@ -258,12 +258,8 @@ let brickDesign = (tab,level) => {
 	memoryLength = 0;
 	for(let i = 0; i < tab.length; i++){
 		for(let j = 0; j < tab[i].length; j++){
-			if(i === 1){
-				translateFunction("if(brk" + ((level * 1000) + (i + memoryLength)) + ".pv === 1){ brick" + ((level * 1000) + (i + memoryLength)) + ".src = 'img/gameObject/brick/metalbrick2.png'}");
-			}
-			if(i === 2){
-				translateFunction("if(brk" + ((level * 1000) + (i + memoryLength)) + ".pv === 2){ brick" + ((level * 1000) + (i + memoryLength)) + ".src = 'img/gameObject/brick/goldbrick2.png'} if(brk" + ((level * 1000) + (i + memoryLength)) + ".pv === 1){ brick" + ((level * 1000) + (i + memoryLength)) + ".src = 'img/gameObject/brick/goldbrick3.png'}");
-			}
+			i === 1 ? translateFunction("if(brk" + ((level * 1000) + (i + memoryLength)) + ".pv === 1){ brick" + ((level * 1000) + (i + memoryLength)) + ".src = 'img/gameObject/brick/metalbrick2.png'}") : false;
+			i === 2 ? translateFunction("if(brk" + ((level * 1000) + (i + memoryLength)) + ".pv === 2){ brick" + ((level * 1000) + (i + memoryLength)) + ".src = 'img/gameObject/brick/goldbrick2.png'} if(brk" + ((level * 1000) + (i + memoryLength)) + ".pv === 1){ brick" + ((level * 1000) + (i + memoryLength)) + ".src = 'img/gameObject/brick/goldbrick3.png'}") : false;
 			memoryLength++;
 		}
 	}

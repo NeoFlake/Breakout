@@ -35,6 +35,30 @@ let bouncingBall = () => {
 	) : false;
 }
 
+// Permet de corriger un bug permettant à la balle de sortir de l'écran de jeu
+
+let ballOnTheBattlefront = () => {
+	launcher != 1 ? (
+		(blc.x > W) ? (
+			blc.x = W - blc.w, 
+			vbY = -2 
+		) : false,
+		(blc.x <= -blc.w/2) ? (
+			blc.x = 0, 
+			vbY = -2
+		) : false
+	) : false;
+}
+
+// Manager d'un ensemble de fonction inhérente à la balle
+
+let ballManager = () => {
+	ballRotation();
+	ballTravel();
+	bouncingBall();
+	ballOnTheBattlefront();
+}
+
 // Permet de réinitialiser la balle contre le paddle de jeu
 
 let stickTheBallOnTheShip = () => {
@@ -49,12 +73,12 @@ let stickTheBallOnTheShip = () => {
 let ballLauncher = () => {
 	CANVAS.addEventListener("click", function(){(startEvent && !swtchInLvl) ? launcher = 2 : false;});
 	window.addEventListener("keypress", function(e){
-		if(startEvent && !swtchInLvl){
-			if(e.keyCode === 32){
-				e.preventDefault();
-				launcher = 2;
-			}
-		}
+		(startEvent && !swtchInLvl) ? (
+			e.keyCode === 32 ? (
+				e.preventDefault(),
+				launcher = 2
+			) : false
+		) : false;
 	});
 }
 
@@ -96,11 +120,7 @@ let launcherOnPhaseOne = () => {
 
 // Phase de lancement de la balle
 
-let launcherOnPhaseTwo = () => {
-	(launcher === 2 && vbY === 0 && vbX === 0) ? (
-		initialVector()
-	) : false;
-}
+let launcherOnPhaseTwo = () => (launcher === 2 && vbY === 0 && vbX === 0) ? initialVector() : false;
 
 // Manager de la réinitialisation de la balle et de son lancement
 
@@ -112,89 +132,40 @@ let launcherSwitch = () => {
 // Gain de point en fonction du temps de survie dans le jeu (de manière active, s'arrête entre les niveaux)
 
 let gainPoint = () => {
-	if(startEvent && !swtchInLvl){
-		timePoint++;
-		if(timePoint === 50){
-			score += 1;
-			timePoint = 0;
-		}
-	}
+	(startEvent && !swtchInLvl) ? (
+		timePoint++,
+		timePoint === 50 ? (
+			score += 1,
+			timePoint = 0
+		) : false
+	) : false;
 }
 
 // Manager de collision permettant de différencier les types de rebond en fonction de l'endroit de la collision
 // entre la balle et une brique
 
 let collisionEffect = brick => {	
-	if(collisions(brick,blc) && !inCollision){
-		score += 100;
-		// let blcTop = blc.y + Math.trunc(blc.w/2);
-		// let blcBot = blc.y + blc.h + Math.trunc(blc.w/2);
-		// let blcLeft = blc.x + Math.trunc(blc.h/2);
-		// let blcRight = blc.x + blc.w + Math.trunc(blc.h/2);
-		// if(blcRight >= brick.x){
-		// 	blc.x = brick.x - 13;
-		//  	vbX *= -1;
-		// }
-		// if(blcLeft <= (brick.x + brick.x)){
-		// 	blc.x = brick.x + brick.w;
-		//     vbX *= -1;
-		// }
-		// if(blcTop <= brick.y + (brick.h/2)){
-		// 	blc.y = blc.y - 13;
-		//  	vbY *= -1;
-		// }
-		// if(blcBot >= brick.y - (brick.h/2)){
-		// 	blc.y = blc.y + 13;
-		// 	vbY *= -1;
-		// }
-
-		
-		if((blc.x + blc.w) > brick.x){
-			if((blc.y <= brick.y + (brick.h/2)) || (blc.y >= brick.y - (brick.h/2))){
-				blc.x += (vbX *= -1);
-			}
-			else{
-				blc.x = brick.x - 13;
-				vbX *= -1;
-			}
-		}
-		if(blc.x < (brick.x + brick.w)){
-			if((blc.y <= brick.y + (brick.h/2)) || (blc.y >= brick.y - (brick.h/2))){
-		 		blc.x += (vbX *= -1);
-			}
-			else{
-				blc.x = brick.x + brick.w;
-		 		vbX *= -1;
-			}
-		}
-		if(blc.y <= brick.y + (brick.h/2)){
-			if(((blc.x + blc.w) > brick.x) || (blc.x < (brick.x + brick.w))){
-				blc.y += (vbY *= -1);
-			}
-			else{
-				blc.y = blc.y - 13;
-				vbY *= -1;
-			}	
-		}
-		if(blc.y >= brick.y - (brick.h/2)){
-			if(((blc.x + blc.w) > brick.x) || (blc.x < (brick.x + brick.w))){
-				blc.y += (vbY *= -1);
-			}
-			else{
-				blc.y = blc.y + 13;
-				vbY *= -1;	
-			}
-		}
-		brick.pv -= 1;
-		brick.pv > 0 ? boundSnd.play() : ( 
-			destroySnd.play(),
-			score += 1000
-		);
-		inCollision = true;
-	}
-	else if(!collisions(brick,blc)){
-		inCollision = false;
-	}
+	collisions(brick,blc) && !inCollision ? (
+		inCollision = true,
+		brick.pv > 0 ? boundSnd.play() : (destroySnd.play(), score += 1000),
+		//Collision sur la gauche ou la droite
+		((blc.y + (blc.h/2) >= brick.y) && ((blc.y + (blc.h/2)) <= (brick.y + brick.h))) ? (
+			(blc.x <= (brick.x + brick.w)) || ((blc.x + blc.w) >= brick.x) ? (
+				vbX *= -1,
+				score += 100,
+				brick.pv -= 1
+			) : false
+		) : false,
+		//Collision sur le haut ou le bas
+		(((blc.x + (blc.w/2)) >= brick.x) && ((blc.x + (blc.w/2)) <= (brick.x + brick.w))) ? (
+			(blc.y <= (brick.y + brick.h)) || ((blc.y + blc.h) >= brick.y) ? (
+				vbY *= -1,
+				score += 100,
+				brick.pv -= 1 
+			) : false
+		) : false
+	) : false,
+	!collisions(brick,blc) ? inCollision = false : false
 }
 
 // Manager permettant générer de manière dynamique l'intégralité des collisions entre la balle et les briques
@@ -215,109 +186,71 @@ let packOfCollisionEffect = (tab,level) => {
 // Côté gauche
 
 let leftShipCollision = () => {
-	if(((blc.x + (blc.w / 2) -1) >= ship.x) && ((blc.x + (blc.w / 2) -1) <= ship.x + (ship.w / 5) -1)){
-		if(vbX < 0 && vbX > -6){
-			vbX -= 1;
-		}
-		else if(vbX > 0 && vbX < 6){
-			vbX = (vbX * -1) -1;
-		}
-		else {
-			vbX = -2;
-		}
-		if(vbY > 0){
-			vbY < 4 ? vbY *= -1 : vbY = (vbY * -1) +1;
-		}
-	}
+	((blc.x + (blc.w / 2) -1) >= ship.x) && ((blc.x + (blc.w / 2) -1) <= ship.x + (ship.w / 5) -1) ? (
+		(vbX < 0 && vbX > -6) ? vbX -= 1 : (
+			(vbX > 0 && vbX < 6) ? vbX = (vbX * -1) -1 : vbX = -2
+		),
+		vbY > 0 ? (
+			vbY < 4 ? vbY *= -1 : vbY = (vbY * -1) +1
+		) : false
+	) : false;
 }
 
 // Côté centre gauche
 
 let middleLeftShipCollision = () => {
-	if(((blc.x + (blc.w / 2) -1) > ship.x + (ship.w / 5) -1) && ((blc.x + (blc.w / 2) -1) <= ship.x + ((ship.w * 2) / 5 -1))){
-		vbY *= -1;
-		if(vbX < 0){
-			vbX *= 1;
-		}
-		else if(vbX > 0){
-			vbX *= -1;
-		}
-		else{
-			vbX = -1;
-		}
-	}
+	((blc.x + (blc.w / 2) -1) > ship.x + (ship.w / 5) -1) && ((blc.x + (blc.w / 2) -1) <= ship.x + ((ship.w * 2) / 5 -1)) ? (
+		vbY *= -1,
+		vbX < 0 ? vbX *= 1 : 
+			vbX > 0 ? vbX *= -1 : vbX = -1
+	) : false;
 }
 
 // Centre
 
 let middleShipCollision = () => {
-	if(launcher != 2){
-		if(((blc.x + (blc.w / 2) -1) > ship.x + (((ship.w * 2) / 5) -1)) && ((blc.x + (blc.w / 2) -1) <= ship.x + (((ship.w * 3) / 5) -1))){
-			if(vbX > 0){
-				vbX -= 1;
-			}
-			else if(vbX < 0){
-				vbX += 1;
-			}
-			if(vbY < 6){
-				vbY = (vbY * -1) -1;
-			}
-			else {
-				vbY *= -1;
-			}
-		}
-	}
+	launcher != 2 ? (
+		(((blc.x + (blc.w / 2) -1) > ship.x + (((ship.w * 2) / 5) -1)) && ((blc.x + (blc.w / 2) -1) <= ship.x + (((ship.w * 3) / 5) -1))) ? (
+			vbX > 0 ? vbX -= 1 : 
+				vbX < 0 ? vbX += 1 : false,
+			vbY < 6 ? vbY = (vbY * -1) -1 : vbY *= -1
+		) : false
+	) : false;
 }
 
 // Côté centre droit
 
 let middleRightShipCollision = () => {
-	if(((blc.x + (blc.w / 2) -1) > ship.x + (((ship.w * 3) / 5) -1)) && ((blc.x + (blc.w / 2) -1) <= ship.x + (((ship.w * 4) / 5) -1))){
-		vbY *= -1;
-		if(vbX < 0){
-			vbX *= -1;
-		}
-		else if(vbX > 0){
-			vbX *= 1;
-		}
-		else {
-			vbX = 1;
-		}
-	}
+	(((blc.x + (blc.w / 2) -1) > ship.x + (((ship.w * 3) / 5) -1)) && ((blc.x + (blc.w / 2) -1) <= ship.x + (((ship.w * 4) / 5) -1))) ? (
+		vbY *= -1,
+		vbX < 0 ? vbX *= -1 : 
+			vbX > 0 ? vbX *= 1 : vbX = 1
+	) : false;
 }
 
 // Côté droit
 
 let rightShipCollision = () => {
-	if(((blc.x + (blc.w / 2) -1) > ship.x + (((ship.w * 4) / 5) -1)) && ((blc.x + (blc.w / 2) -1) <= ship.x + ship.w - 1)){
-		if(vbX < 0 && vbX > -6){
-			vbX = (vbX * -1) +1;
-		}
-		else if(vbX > 0 && vbX < 6){
-			vbX += 1;
-		}
-		else {
-			vbX = 2;
-		}
-		if(vbY > 0){
-			vbY < 4 ? vbY *= -1 : vbY = (vbY * -1) +1;
-		}
-	}
+	(((blc.x + (blc.w / 2) -1) > ship.x + (((ship.w * 4) / 5) -1)) && ((blc.x + (blc.w / 2) -1) <= ship.x + ship.w - 1)) ? (
+		(vbX < 0 && vbX > -6) ? vbX = (vbX * -1) +1 : 
+			(vbX > 0 && vbX < 6) ? vbX += 1 : vbX = 2,
+		vbY > 0 ? (
+			vbY < 4 ? vbY *= -1 : vbY = (vbY * -1) +1
+		) : false
+	) : false;
 }
 
 // Manager des collisions entre la balle et le paddle
 
 let shipCollisionManager = () => {
-	if(collisions(ship,blc)){
-		if(launcher != 1){
-		boundSnd.play();
-		}
-		leftShipCollision();
-		middleLeftShipCollision();
-		middleShipCollision();
-		middleRightShipCollision();
-		rightShipCollision();
-	}
+	collisions(ship,blc) ? (
+		launcher != 1 ? boundSnd.play() : false,
+		leftShipCollision(),
+		middleLeftShipCollision(),
+		middleShipCollision(),
+		middleRightShipCollision(),
+		rightShipCollision()
+	) : false;
 }
 
 // Gestionnaire des effets lors de la sortie de la balle en bas de l'écran
@@ -360,43 +293,43 @@ let winLevel = (tab,level) => {
 // soit de la fin du jeu
 
 let passLevel = (tab,level) => {
-	if(winLevel(tab,level) && !launchReady){
-		launcher = 1;
-		launchReady = true;
+	(winLevel(tab,level) && !launchReady) ? (
+		launcher = 1,
+		launchReady = true,
 		setTimeout(function(){
 			launcher = 1;
 			swtchInLvl = true;
 			swtchStoryScreen = true;
 			counterLevel++;
 			launchReady = false;
-			if(counterLevel === 4){
-				endGame = true;
-				endGameStory = true;
-		}}, 4300);
-		
-	}
+			life < 3 ? life += 1 : false;
+			counterLevel === 4 ? (
+				endGame = true,
+				endGameStory = true
+			) : false;
+		}, 4300)
+	) : false;
 }
 
 // Gestionnaire de la musique principale du niveau
 
 let levelMusic = token => {
-	if(translateFunction("musicLevel" + token + ".currentTime === 0")){
-		translateFunction("musicLevel" + token + ".play();");
-	}
-	if(translateFunction("musicLevel" + token + ".currentTime === musicLevel" + token + ".duration;")){
-		translateFunction("musicLevel" + token + ".pause();");
-		translateFunction("musicLevel" + token + ".currentTime = 0;");
-	}
+	(translateFunction("musicLevel" + token + ".currentTime === 0")) ? 
+		translateFunction("musicLevel" + token + ".play();") : false;
+	(translateFunction("musicLevel" + token + ".currentTime === musicLevel" + token + ".duration;")) ? (
+		translateFunction("musicLevel" + token + ".pause();"),
+		translateFunction("musicLevel" + token + ".currentTime = 0;")
+	) : false;
 }
 
 // Gestionnaire de la musique lors de la victoire d'un niveau
 
 let winLevelMusicLauncher = (tab,level) => {
-	if(winLevel(tab,level)){
-		translateFunction("musicLevel" + level + ".pause();");
-		translateFunction("musicLevel" + level + ".currenTime = 0;");
-		winLevelMusic.play();
-	}
+	winLevel(tab,level) ? (
+		translateFunction("musicLevel" + level + ".pause();"),
+		translateFunction("musicLevel" + level + ".currenTime = 0;"),
+		winLevelMusic.play()
+	) : false;
 }
 
 // Gestionnaire des musiques inter-niveaux

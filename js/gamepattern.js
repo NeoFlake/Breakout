@@ -111,38 +111,27 @@ let gameLauncher = () => {
 // Gestionnaire de l'intégralité des fonctions inhérente à la partie jouable du jeu (et des entre-niveaux)
 
 let game = () => {
-	if(startEvent){
-		ballRotation();
-		ballTravel();
-		bouncingBall();
-		shipCollisionManager();
-		gainPoint();
-		looseLife();
-		looseGame();
-		if(swtchInLvl){
-			if(!endGame){
-				interLevelManager(counterLevel);
-				interLevelMusicManager();
-			}
-			if(endGame){
-				endGameManager();
-				endGameMusicManager();
-			}
-		}
-		if(!swtchInLvl){
-			if(counterLevel === 1){
-				packOfCollisionEffect(translateFunction("brickpositionLevel" + counterLevel),counterLevel);
-			}
-			if(counterLevel > 1 && launcher != 1){
-				packOfCollisionEffect(translateFunction("brickpositionLevel" + counterLevel),counterLevel);
-			}
-			brickDesign(translateFunction("brickpositionLevel" + counterLevel),counterLevel);
-			levelMusic(counterLevel);
-			winLevelMusicLauncher(translateFunction("brickpositionLevel" + counterLevel),counterLevel);
-			passLevel(translateFunction("brickpositionLevel" + counterLevel),counterLevel);
-		}
-	}
-	if(!startEvent){
-		gameOverMusicManager(counterLevel);
-	}
+	startEvent ? (
+		ballManager(),
+		shipCollisionManager(),
+		gainPoint(),
+		looseLife(),
+		looseGame(),
+		swtchInLvl ? (
+			endGame ? (
+				endGameManager(),
+				endGameMusicManager()
+			) : (
+				interLevelManager(counterLevel),
+				interLevelMusicManager()
+			)
+		) : (
+			counterLevel === 1 ? packOfCollisionEffect(translateFunction("brickpositionLevel" + counterLevel),counterLevel) : false,
+			counterLevel > 1 && launcher != 1 ? packOfCollisionEffect(translateFunction("brickpositionLevel" + counterLevel),counterLevel) : false,
+			brickDesign(translateFunction("brickpositionLevel" + counterLevel),counterLevel),
+			levelMusic(counterLevel),
+			winLevelMusicLauncher(translateFunction("brickpositionLevel" + counterLevel),counterLevel),
+			passLevel(translateFunction("brickpositionLevel" + counterLevel),counterLevel)
+		)
+	) : gameOverMusicManager(counterLevel);
 }
