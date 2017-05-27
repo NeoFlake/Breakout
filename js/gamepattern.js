@@ -12,7 +12,7 @@
 let storyManager = token => {
 	swtchStoryScreen ? (
 		counterLevel != 1 ? CANVAS.addEventListener("click",function(){screenAccelerator = true;}) : false,
-		translateFunction("storylvl" + token + "scrn.y === 0") ? setTimeout(function(){if(translateFunction("storylvl" + token + "scrn.y === 0")){translateFunction("storylvl" + token + "scrn.y -=1;")}},3000) : false,
+		translateFunction("storylvl" + token + "scrn.y === 0") ? setTimeout(function(){translateFunction("storylvl" + token + "scrn.y === 0") ? translateFunction("storylvl" + token + "scrn.y -=1;") : false;},3000) : false,
 		screenAccelerator ? (
 			(translateFunction("storylvl" + token + "scrn.y < 0") && translateFunction("storylvl" + token + "scrn.y > -500")) ? (
 				translateFunction("storylvl" + token + "scrn.y -= 100")
@@ -52,33 +52,21 @@ let interLevelManager = token => {
 // Manager du déroulement de l'écran d'histoire de la fin du jeu
 
 let endStory = () => {
-	if(endGameStory){
-		if(fnlstr.y === 0){
-			setTimeout(function(){fnlstr.y === 0 ? fnlstr.y -= 1 : false;}, 3000);
-		}
-		else if(fnlstr.y > -500){
-			fnlstr.y -= .5;
-		}
-		else if(fnlstr.y <= -500){
-			setTimeout(function(){endGameStory = false; endGameCredits = true}, 3000);
-		}
-	}
+	endGameStory ? (
+		fnlstr.y === 0 ? setTimeout(function(){fnlstr.y === 0 ? fnlstr.y -= 1 : false;}, 3000) : 
+			fnlstr.y > -500 ? fnlstr.y -= .5 : 
+				fnlstr.y <= -500 ? setTimeout(function(){endGameStory = false; endGameCredits = true}, 3000) : false
+	) : false;
 }
 
 // Fonction permettant le déroulement des crédits
 
 let endCredits = () => {
-	if(endGameCredits){
-		if(crdt.y === 0){
-			setTimeout(function(){if(crdt.y === 0){crdt.y -= 1;}}, 3000);
-		}
-		else if (crdt.y > -500){
-			crdt.y -= .5;
-		}
-		else if(crdt.y <= -500){
-			setTimeout(function(){endGameCredits = false; endGameFinalScreen = true}, 3000);
-		}
-	}
+	endGameCredits ? (
+		crdt.y === 0 ? setTimeout(function(){if(crdt.y === 0){crdt.y -= 1;}}, 3000) : 
+			crdt.y > -500 ? crdt.y -= .5 : 
+				crdt.y <= -500 ? setTimeout(function(){endGameCredits = false; endGameFinalScreen = true}, 3000) : false
+	) : false;
 }
 
 // Fonction permettant le redémarrage du jeu à la fin de celui-ci au bout de dix secondes

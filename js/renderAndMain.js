@@ -57,58 +57,38 @@ let lvlScreenRender = token => translateFunction("CONTEXT.drawImage(level" + tok
 // Manager des visuels des élements récurents d'entre-niveaux
 
 let interLevelScreenRender = token => {
-	if(swtchStoryScreen && !swtchlvlScreen){
-		storyLevelScreenRender(token);
-	}
-	else if(swtchlvlScreen && !swtchStoryScreen){
-		lvlScreenRender(token);
-	}
+	(swtchStoryScreen && !swtchlvlScreen) ? storyLevelScreenRender(token) : 
+		(swtchlvlScreen && !swtchStoryScreen) ? lvlScreenRender(token) : false
 }
 
 // Manager des visuels des écrans de fin de niveau
 
 let endingScreenRenderManager = () => {
-	if(endGameStory && (!endGameCredits && !endGameFinalScreen)){
-		finalStoryRender();
-	}
-	else if (endGameCredits && (!endGameStory && !endGameFinalScreen)){
-		creditsRender();
-	}
-	else if(endGameFinalScreen && (!endGameStory && !endGameCredits)){
-		finalScreenRender();
-	}
+	(endGameStory && (!endGameCredits && !endGameFinalScreen)) ? finalStoryRender() :
+		(endGameCredits && (!endGameStory && !endGameFinalScreen)) ? creditsRender() :
+			(endGameFinalScreen && (!endGameStory && !endGameCredits)) ? finalScreenRender() : false
 }
 
 // Fonction gérant l'intégralité des visuels du jeu en fonction de conditionnelle
 
 let fullRender = () => {
 	bckRender();
-	if(!startEvent){
-		if(!looseGameCount){
-			startRender();
-			cursorRender();
-		}
-		else{
-			GmOvRender();
-		}
-	}
-	if(startEvent){
-		if(swtchInLvl){
-			if(!endGame){
-				interLevelScreenRender(counterLevel);
-			}
-			if(endGame){
-				endingScreenRenderManager();
-			}
-		}
-		if(!swtchInLvl){
-			shiprender();
-			ballrender();
-			drawScore();
-			lifeRender();
-			brickrender(translateFunction("brickpositionLevel" + counterLevel),counterLevel);
-		}	
-	}
+	startEvent ? (
+		swtchInLvl ? (
+			endGame ? endingScreenRenderManager() : interLevelScreenRender(counterLevel)
+		) : (
+			shiprender(),
+			ballrender(),
+			drawScore(),
+			lifeRender(),
+			brickrender(translateFunction("brickpositionLevel" + counterLevel),counterLevel)
+		)	
+	) : (
+		looseGameCount ? GmOvRender() : (
+			startRender(),
+			cursorRender()
+		)
+	);
 }
 
 // Fonction de boucle permettant au jeu de se modifier de manière récurrente grâce au setInterval
